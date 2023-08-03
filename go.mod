@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/apache/thrift v0.18.1
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cloudwego/kitex v0.6.2
 )
 
@@ -39,3 +40,5 @@ require (
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
