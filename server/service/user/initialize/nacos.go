@@ -4,6 +4,7 @@ import (
 	"GoYin/server/common/consts"
 	"GoYin/server/service/user/config"
 	"github.com/bwmarrin/snowflake"
+	"github.com/bytedance/sonic"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/registry"
 	"github.com/cloudwego/kitex/pkg/utils"
@@ -27,18 +28,37 @@ func InitNacos() (registry.Registry, *registry.Info) {
 	klog.Infof("Config Info: %v", config.GlobalNacosConfig)
 
 	sc := []constant.ServerConfig{
-		*constant.NewServerConfig("127.0.0.1", 8848),
+		*constant.NewServerConfig(config.GlobalNacosConfig.Host, config.GlobalNacosConfig.Port),
 	}
 
 	cc := constant.ClientConfig{
 		NamespaceId:         config.GlobalNacosConfig.Namespace,
 		TimeoutMs:           5000,
 		NotLoadCacheAtStart: true,
-		LogDir:              "/tmp/nacos/log",
-		CacheDir:            "/tmp/nacos/cache",
+		LogDir:              "./tmp/nacos/log",
+		CacheDir:            "./tmp/nacos/cache",
 		LogLevel:            "info",
-		Username:            config.GlobalNacosConfig.Namespace,
-		Password:            config.GlobalNacosConfig.Namespace,
+		Username:            config.GlobalNacosConfig.User,
+		Password:            config.GlobalNacosConfig.Password,
+	}
+	configClient, err := clients.CreateConfigClient(map[string]interface{}{
+		"serverConfigs": sc,
+		"clientConfig":  cc,
+	})
+	if err != nil {
+		klog.Fatalf("create config client failed: %s", err)
+	}
+	content, err := configClient.GetConfig(vo.ConfigParam{
+		DataId: config.GlobalNacosConfig.DataId,
+		Group:  config.GlobalNacosConfig.Group,
+	})
+	if err != nil {
+		klog.Fatalf("get config failed: %s", err.Error())
+	}
+
+	err = sonic.Unmarshal([]byte(content), &config.GlobalServerConfig)
+	if err != nil {
+		klog.Fatalf("nacos config failed: %s", err)
 	}
 
 	cli, err := clients.NewNamingClient(
@@ -51,7 +71,7 @@ func InitNacos() (registry.Registry, *registry.Info) {
 		klog.Errorf("create registry err: %s", err.Error())
 	}
 
-	r := nacos.NewNacosRegistry(cli, nacos.WithGroup("user_group")) //group?
+	r := nacos.NewNacosRegistry(cli, nacos.WithGroup(config.GlobalNacosConfig.Group))
 
 	sf, err := snowflake.NewNode(consts.NacosSnowflakeNode)
 	if err != nil {

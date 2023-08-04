@@ -4,5 +4,5 @@ port: 8848
 namespace: 'cddf6fc0-297e-48c5-a852-e3b9a93b6435'
 user: 'nacos'
 password: '3G'
-dataid: 'user_srv'
+dataid: 'usr_srv'
 group: 'USER_GROUP'
