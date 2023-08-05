@@ -17,3 +17,11 @@ func NewRedisManager(client *redis.Client) *RedisManager {
 func (r *RedisManager) CreateUser(ctx context.Context, user *model.User) error {
 	return nil
 }
+
+func (r *RedisManager) GetUserById(ctx context.Context, id int64) (*model.User, error) {
+	return nil, nil
+}
+
+func (r *RedisManager) BatchGetUserById(ctx context.Context, id []int64) ([]*model.User, error) {
+	return nil, nil
+}

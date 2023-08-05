@@ -17,6 +17,8 @@ type MysqlManager interface {
 }
 type RedisManager interface {
 	CreateUser(ctx context.Context, user *model.User) error
+	GetUserById(ctx context.Context, id int64) (*model.User, error)
+	BatchGetUserById(ctx context.Context, id []int64) ([]*model.User, error)
 }
 
 // UserServiceImpl implements the last service interface defined in the IDL.
@@ -87,14 +89,72 @@ func (s *UserServiceImpl) Login(ctx context.Context, req *user.DouyinUserLoginRe
 
 // GetUserInfo implements the UserServiceImpl interface.
 func (s *UserServiceImpl) GetUserInfo(ctx context.Context, req *user.DouyinGetUserRequest) (resp *user.DouyinGetUserResponse, err error) {
-	// TODO: Your code here...
+	resp = new(user.DouyinGetUserResponse)
+
+	usr, err := s.RedisManager.GetUserById(ctx, req.OwnerId)
+	if err != nil {
+		klog.Errorf("redis get user by id failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  fmt.Sprintf("redis get user by id failed,%s", err),
+		}
+		return nil, err
+	}
+	resp.BaseResp = &base.DouyinBaseResponse{
+		StatusCode: 200,
+		StatusMsg:  "get user by id success",
+	}
+	resp.User = &base.User{
+		Id:              usr.ID,
+		Name:            usr.Username,
+		FollowCount:     0,
+		FollowerCount:   0,
+		IsFollow:        false,
+		Avatar:          usr.Avatar,
+		BackgroundImage: usr.BackGroundImage,
+		Signature:       usr.Signature,
+		TotalFavorited:  0,
+		WorkCount:       0,
+		FavoriteCount:   0,
+	}
 	return
 }
 
 // BatchGetUserInfo implements the UserServiceImpl interface.
 func (s *UserServiceImpl) BatchGetUserInfo(ctx context.Context, req *user.DouyinBatchGetUserRequest) (resp *user.DouyinBatchGetUserResonse, err error) {
-	// TODO: Your code here...
-	return
+	resp = new(user.DouyinBatchGetUserResonse)
+
+	usrs, err := s.BatchGetUserById(ctx, req.OwnerIdList)
+	if err != nil {
+		klog.Errorf("redis batch get users by id failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  fmt.Sprintf("redis batch get users by id failed,%s", err),
+		}
+		return nil, err
+	}
+	resp.BaseResp = &base.DouyinBaseResponse{
+		StatusCode: 200,
+		StatusMsg:  "batch get users by id success",
+	}
+	var u []*base.User
+	for _, v := range usrs {
+		u = append(u, &base.User{
+			Id:              v.ID,
+			Name:            v.Username,
+			FollowCount:     0,
+			FollowerCount:   0,
+			IsFollow:        false,
+			Avatar:          v.Avatar,
+			BackgroundImage: v.BackGroundImage,
+			Signature:       v.Signature,
+			TotalFavorited:  0,
+			WorkCount:       0,
+			FavoriteCount:   0,
+		})
+	}
+	resp.UserList = u
+	return resp, nil
 }
 
 // GetFollowList implements the UserServiceImpl interface.

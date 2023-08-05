@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/apache/thrift v0.18.1
 	github.com/bwmarrin/snowflake v0.3.0
+	github.com/bytedance/sonic v1.8.8
 	github.com/cloudwego/kitex v0.6.2
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/kitex-contrib/obs-opentelemetry/logging/logrus v0.0.0-20230530060140-c76e27f58391
@@ -21,7 +22,6 @@ require (
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.18 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/bytedance/gopkg v0.0.0-20230531144706-a12972768317 // indirect
-	github.com/bytedance/sonic v1.8.8 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/chenzhuoyu/iasm v0.0.0-20230222070914-0b1b64b0e762 // indirect
