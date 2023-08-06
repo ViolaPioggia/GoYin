@@ -2,27 +2,35 @@ package main
 
 import (
 	"GoYin/server/common/consts"
+	"GoYin/server/common/middleware"
 	"GoYin/server/common/tools"
 	"GoYin/server/kitex_gen/base"
 	user "GoYin/server/kitex_gen/user"
-	"GoYin/server/service/user/model"
+	models2 "GoYin/server/service/api/models"
+	"GoYin/server/service/user/config"
+	"GoYin/server/service/user/models"
 	"context"
 	"fmt"
 	"github.com/bwmarrin/snowflake"
 	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/golang-jwt/jwt"
+	"gorm.io/gorm"
+	"time"
 )
 
 type MysqlManager interface {
-	CreateUser(ctx context.Context, user *model.User) error
+	CreateUser(ctx context.Context, user *models.User) error
+	GetUserByUsername(ctx context.Context, username string) (*models.User, error)
 }
 type RedisManager interface {
-	CreateUser(ctx context.Context, user *model.User) error
-	GetUserById(ctx context.Context, id int64) (*model.User, error)
-	BatchGetUserById(ctx context.Context, id []int64) ([]*model.User, error)
+	CreateUser(ctx context.Context, user *models.User) error
+	GetUserById(ctx context.Context, id int64) (*models.User, error)
+	BatchGetUserById(ctx context.Context, id []int64) ([]*models.User, error)
 }
 
 // UserServiceImpl implements the last service interface defined in the IDL.
 type UserServiceImpl struct {
+	Jwt *middleware.JWT
 	MysqlManager
 	RedisManager
 }
@@ -40,10 +48,10 @@ func (s *UserServiceImpl) Register(ctx context.Context, req *user.DouyinUserRegi
 		}
 		return resp, nil
 	}
-	usr := &model.User{
+	usr := &models.User{
 		ID:              sf.Generate().Int64(),
 		Username:        req.Username,
-		Password:        tools.Md5Crypt(req.Password, "salt"),
+		Password:        tools.Md5Crypt(req.Password, config.GlobalServerConfig.MysqlInfo.Salt),
 		Avatar:          "",
 		BackGroundImage: "",
 		Signature:       "default signature",
@@ -73,7 +81,22 @@ func (s *UserServiceImpl) Register(ctx context.Context, req *user.DouyinUserRegi
 		return resp, err
 	}
 	resp.UserId = usr.ID
-	resp.Token = ""
+	resp.Token, err = s.Jwt.CreateToken(models2.CustomClaims{
+		ID: usr.ID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Unix() + 60*60*24*30,
+			Issuer:    "GoYin",
+			NotBefore: time.Now().Unix(),
+		},
+	})
+	if err != nil {
+		klog.Errorf("register create jwt failed", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  fmt.Sprintf("register create jwt failed,%s", err),
+		}
+		return resp, err
+	}
 	resp.BaseResp = &base.DouyinBaseResponse{
 		StatusCode: 200,
 		StatusMsg:  "user register success",
@@ -83,8 +106,57 @@ func (s *UserServiceImpl) Register(ctx context.Context, req *user.DouyinUserRegi
 
 // Login implements the UserServiceImpl interface.
 func (s *UserServiceImpl) Login(ctx context.Context, req *user.DouyinUserLoginRequest) (resp *user.DouyinUserLoginResponse, err error) {
-	// TODO: Your code here...
-	return
+	resp = new(user.DouyinUserLoginResponse)
+
+	usr, err := s.MysqlManager.GetUserByUsername(ctx, req.Username)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			resp.BaseResp = &base.DouyinBaseResponse{
+				StatusCode: 500,
+				StatusMsg:  "no such user",
+			}
+			return resp, nil
+		} else {
+			klog.Errorf("mysql get user by username failed", err)
+			resp.BaseResp = &base.DouyinBaseResponse{
+				StatusCode: 500,
+				StatusMsg:  err.Error(),
+			}
+			return resp, err
+		}
+	}
+
+	if usr.Password != tools.Md5Crypt(req.Password, config.GlobalServerConfig.MysqlInfo.Salt) {
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "wrong password",
+		}
+		return resp, nil
+	}
+
+	resp.UserId = usr.ID
+	resp.Token, err = s.Jwt.CreateToken(models2.CustomClaims{
+		ID: usr.ID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Unix() + 60*60*24*30,
+			Issuer:    "GoYin",
+			NotBefore: time.Now().Unix(),
+		},
+	})
+	if err != nil {
+		klog.Errorf("register create jwt failed", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  fmt.Sprintf("register create jwt failed,%s", err),
+		}
+		return resp, err
+	}
+
+	resp.BaseResp = &base.DouyinBaseResponse{
+		StatusCode: 200,
+		StatusMsg:  "login success",
+	}
+	return resp, nil
 }
 
 // GetUserInfo implements the UserServiceImpl interface.
