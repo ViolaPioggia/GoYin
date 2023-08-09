@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"GoYin/server/service/user/models"
+	"GoYin/server/service/user/model"
 	"context"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"gorm.io/gorm"
@@ -11,17 +11,17 @@ type User struct {
 	db *gorm.DB
 }
 
-func (u User) CreateUser(ctx context.Context, user *models.User) error {
+func (u User) CreateUser(ctx context.Context, user *model.User) error {
 	//TODO implement me
 	return nil
 }
-func (u User) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
+func (u User) GetUserByUsername(ctx context.Context, username string) (*model.User, error) {
 	return nil, nil
 }
 func NewUser(db *gorm.DB) *User {
 	m := db.Migrator()
-	if !m.HasTable(&models.User{}) {
-		err := m.CreateTable(&models.User{})
+	if !m.HasTable(&model.User{}) {
+		err := m.CreateTable(&model.User{})
 		if err != nil {
 			klog.Errorf("create mysql table failed,", err)
 		}

@@ -8,7 +8,7 @@ import (
 	user "GoYin/server/kitex_gen/user"
 	models2 "GoYin/server/service/api/models"
 	"GoYin/server/service/user/config"
-	"GoYin/server/service/user/models"
+	"GoYin/server/service/user/model"
 	"context"
 	"fmt"
 	"github.com/bwmarrin/snowflake"
@@ -19,13 +19,13 @@ import (
 )
 
 type MysqlManager interface {
-	CreateUser(ctx context.Context, user *models.User) error
-	GetUserByUsername(ctx context.Context, username string) (*models.User, error)
+	CreateUser(ctx context.Context, user *model.User) error
+	GetUserByUsername(ctx context.Context, username string) (*model.User, error)
 }
 type RedisManager interface {
-	CreateUser(ctx context.Context, user *models.User) error
-	GetUserById(ctx context.Context, id int64) (*models.User, error)
-	BatchGetUserById(ctx context.Context, id []int64) ([]*models.User, error)
+	CreateUser(ctx context.Context, user *model.User) error
+	GetUserById(ctx context.Context, id int64) (*model.User, error)
+	BatchGetUserById(ctx context.Context, id []int64) ([]*model.User, error)
 }
 
 // UserServiceImpl implements the last service interface defined in the IDL.
@@ -48,7 +48,7 @@ func (s *UserServiceImpl) Register(ctx context.Context, req *user.DouyinUserRegi
 		}
 		return resp, nil
 	}
-	usr := &models.User{
+	usr := &model.User{
 		ID:              sf.Generate().Int64(),
 		Username:        req.Username,
 		Password:        tools.Md5Crypt(req.Password, config.GlobalServerConfig.MysqlInfo.Salt),
@@ -231,7 +231,8 @@ func (s *UserServiceImpl) BatchGetUserInfo(ctx context.Context, req *user.Douyin
 
 // GetFollowList implements the UserServiceImpl interface.
 func (s *UserServiceImpl) GetFollowList(ctx context.Context, req *user.DouyinGetRelationFollowListRequest) (resp *user.DouyinGetRelationFollowListResponse, err error) {
-	// TODO: Your code here...
+	resp = new(user.DouyinGetRelationFollowListResponse)
+
 	return
 }
 

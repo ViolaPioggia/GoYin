@@ -12,4 +12,8 @@ const (
 	UserConfigPath = "./server/service/user/config.yaml"
 
 	RedisUserClientDB = 1
+
+	FollowList   = 0
+	FollowerList = 1
+	FriendsList  = 2
 )
