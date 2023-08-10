@@ -28,4 +28,7 @@ const (
 
 	DeleteComment = 2
 	Comment       = 1
+
+	SentMessage    = 1
+	ReceiveMessage = 0
 )
