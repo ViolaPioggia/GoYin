@@ -27,12 +27,23 @@ type RedisManager interface {
 	GetUserById(ctx context.Context, id int64) (*model.User, error)
 	BatchGetUserById(ctx context.Context, id []int64) ([]*model.User, error)
 }
+type SocialManager interface {
+	GetRelationList(ctx context.Context, viewerId, ownerId int64, option int8) ([]int64, error)
+	GetSocialInfo(ctx context.Context, viewerId, ownerId int64) (*base.SocialInfo, error)
+	BatchGetSocialInfo(ctx context.Context, viewerId int64, ownerIdList []int64) ([]*base.SocialInfo, error)
+}
+type InteractionManager interface {
+	GetInteractInfo(ctx context.Context, userId int64) (*base.UserInteractInfo, error)
+	BatchGetInteractInfo(ctx context.Context, userIdList []int64) ([]*base.UserInteractInfo, error)
+}
 
 // UserServiceImpl implements the last service interface defined in the IDL.
 type UserServiceImpl struct {
 	Jwt *middleware.JWT
 	MysqlManager
 	RedisManager
+	SocialManager
+	InteractionManager
 }
 
 // Register implements the UserServiceImpl interface.
@@ -172,6 +183,25 @@ func (s *UserServiceImpl) GetUserInfo(ctx context.Context, req *user.DouyinGetUs
 		}
 		return nil, err
 	}
+
+	socialInfo, err := s.SocialManager.GetSocialInfo(ctx, req.ViewerId, req.OwnerId)
+	if err != nil {
+		klog.Errorf("socialManager get socialInfo failed,", err)
+	}
+
+	interactionInfo, err := s.InteractionManager.GetInteractInfo(ctx, req.OwnerId)
+	if err != nil {
+		klog.Errorf("interactionManager get interactionInfo failed,", err)
+	}
+
+	if err != nil {
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "get userInfo failed",
+		}
+		return resp, err
+	}
+
 	resp.BaseResp = &base.DouyinBaseResponse{
 		StatusCode: 200,
 		StatusMsg:  "get user by id success",
@@ -179,24 +209,24 @@ func (s *UserServiceImpl) GetUserInfo(ctx context.Context, req *user.DouyinGetUs
 	resp.User = &base.User{
 		Id:              usr.ID,
 		Name:            usr.Username,
-		FollowCount:     0,
-		FollowerCount:   0,
-		IsFollow:        false,
+		FollowCount:     socialInfo.FollowCount,
+		FollowerCount:   socialInfo.FollowerCount,
+		IsFollow:        socialInfo.IsFollow,
 		Avatar:          usr.Avatar,
 		BackgroundImage: usr.BackGroundImage,
 		Signature:       usr.Signature,
-		TotalFavorited:  0,
-		WorkCount:       0,
-		FavoriteCount:   0,
+		TotalFavorited:  interactionInfo.TotalFavorited,
+		WorkCount:       interactionInfo.WorkCount,
+		FavoriteCount:   interactionInfo.FavoriteCount,
 	}
-	return
+	return resp, nil
 }
 
 // BatchGetUserInfo implements the UserServiceImpl interface.
 func (s *UserServiceImpl) BatchGetUserInfo(ctx context.Context, req *user.DouyinBatchGetUserRequest) (resp *user.DouyinBatchGetUserResonse, err error) {
 	resp = new(user.DouyinBatchGetUserResonse)
 
-	usrs, err := s.BatchGetUserById(ctx, req.OwnerIdList)
+	userList, err := s.RedisManager.BatchGetUserById(ctx, req.OwnerIdList)
 	if err != nil {
 		klog.Errorf("redis batch get users by id failed,", err)
 		resp.BaseResp = &base.DouyinBaseResponse{
@@ -205,27 +235,43 @@ func (s *UserServiceImpl) BatchGetUserInfo(ctx context.Context, req *user.Douyin
 		}
 		return nil, err
 	}
-	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
-		StatusMsg:  "batch get users by id success",
+	socialList, err := s.SocialManager.BatchGetSocialInfo(ctx, req.ViewerId, req.OwnerIdList)
+	if err != nil {
+		klog.Errorf("user socialManager get socialList failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "user socialManager get socialList failed",
+		}
+		return resp, err
 	}
-	var u []*base.User
-	for _, v := range usrs {
-		u = append(u, &base.User{
-			Id:              v.ID,
-			Name:            v.Username,
-			FollowCount:     0,
-			FollowerCount:   0,
-			IsFollow:        false,
-			Avatar:          v.Avatar,
-			BackgroundImage: v.BackGroundImage,
-			Signature:       v.Signature,
-			TotalFavorited:  0,
-			WorkCount:       0,
-			FavoriteCount:   0,
+	interactionList, err := s.InteractionManager.BatchGetInteractInfo(ctx, req.OwnerIdList)
+	if err != nil {
+		klog.Errorf("user interactionManager get interactionList failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "user interactionManager get interactionList failed",
+		}
+		return resp, err
+	}
+	for i := 0; i <= len(userList)-1; i++ {
+		resp.UserList = append(resp.UserList, &base.User{
+			Id:              userList[i].ID,
+			Name:            userList[i].Username,
+			FollowCount:     socialList[i].FollowCount,
+			FollowerCount:   socialList[i].FollowerCount,
+			IsFollow:        socialList[i].IsFollow,
+			Avatar:          userList[i].Avatar,
+			BackgroundImage: userList[i].BackGroundImage,
+			Signature:       userList[i].Signature,
+			TotalFavorited:  interactionList[i].TotalFavorited,
+			WorkCount:       interactionList[i].WorkCount,
+			FavoriteCount:   interactionList[i].FavoriteCount,
 		})
 	}
-	resp.UserList = u
+	resp.BaseResp = &base.DouyinBaseResponse{
+		StatusCode: 200,
+		StatusMsg:  "batch get userInfo success",
+	}
 	return resp, nil
 }
 
@@ -233,17 +279,185 @@ func (s *UserServiceImpl) BatchGetUserInfo(ctx context.Context, req *user.Douyin
 func (s *UserServiceImpl) GetFollowList(ctx context.Context, req *user.DouyinGetRelationFollowListRequest) (resp *user.DouyinGetRelationFollowListResponse, err error) {
 	resp = new(user.DouyinGetRelationFollowListResponse)
 
-	return
+	userIdlist, err := s.SocialManager.GetRelationList(ctx, req.ViewerId, req.OwnerId, consts.FollowList)
+	if err != nil {
+		klog.Errorf("user socialManager get follow list failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "user socialManager get followList failed ",
+		}
+		return resp, err
+	}
+	userList, err := s.RedisManager.BatchGetUserById(ctx, userIdlist)
+	if err != nil {
+		klog.Errorf("user redis get user failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "user redis get user failed ",
+		}
+		return resp, err
+	}
+	socialList, err := s.SocialManager.BatchGetSocialInfo(ctx, req.ViewerId, userIdlist)
+	if err != nil {
+		klog.Errorf("user socialManager get socialList failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "user socialManager get socialList failed",
+		}
+		return resp, err
+	}
+	interactionList, err := s.InteractionManager.BatchGetInteractInfo(ctx, userIdlist)
+	if err != nil {
+		klog.Errorf("user interactionManager get interactionList failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "user interactionManager get interactionList failed",
+		}
+		return resp, err
+	}
+	for i := 0; i <= len(userList)-1; i++ {
+		resp.UserList = append(resp.UserList, &base.User{
+			Id:              userList[i].ID,
+			Name:            userList[i].Username,
+			FollowCount:     socialList[i].FollowCount,
+			FollowerCount:   socialList[i].FollowerCount,
+			IsFollow:        socialList[i].IsFollow,
+			Avatar:          userList[i].Avatar,
+			BackgroundImage: userList[i].BackGroundImage,
+			Signature:       userList[i].Signature,
+			TotalFavorited:  interactionList[i].TotalFavorited,
+			WorkCount:       interactionList[i].WorkCount,
+			FavoriteCount:   interactionList[i].FavoriteCount,
+		})
+	}
+	resp.BaseResp = &base.DouyinBaseResponse{
+		StatusCode: 200,
+		StatusMsg:  "batch get followList success",
+	}
+	return resp, nil
 }
 
 // GetFollowerList implements the UserServiceImpl interface.
 func (s *UserServiceImpl) GetFollowerList(ctx context.Context, req *user.DouyinGetRelationFollowerListRequest) (resp *user.DouyinGetRelationFollowerListResponse, err error) {
-	// TODO: Your code here...
-	return
+	resp = new(user.DouyinGetRelationFollowerListResponse)
+
+	userIdlist, err := s.SocialManager.GetRelationList(ctx, req.ViewerId, req.OwnerId, consts.FollowerList)
+	if err != nil {
+		klog.Errorf("user socialManager get follower list failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "user socialManager get followerList failed ",
+		}
+		return resp, err
+	}
+	userList, err := s.RedisManager.BatchGetUserById(ctx, userIdlist)
+	if err != nil {
+		klog.Errorf("user redis get user failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "user redis get user failed ",
+		}
+		return resp, err
+	}
+	socialList, err := s.SocialManager.BatchGetSocialInfo(ctx, req.ViewerId, userIdlist)
+	if err != nil {
+		klog.Errorf("user socialManager get socialList failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "user socialManager get socialList failed",
+		}
+		return resp, err
+	}
+	interactionList, err := s.InteractionManager.BatchGetInteractInfo(ctx, userIdlist)
+	if err != nil {
+		klog.Errorf("user interactionManager get interactionList failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "user interactionManager get interactionList failed",
+		}
+		return resp, err
+	}
+	for i := 0; i <= len(userList)-1; i++ {
+		resp.UserList = append(resp.UserList, &base.User{
+			Id:              userList[i].ID,
+			Name:            userList[i].Username,
+			FollowCount:     socialList[i].FollowCount,
+			FollowerCount:   socialList[i].FollowerCount,
+			IsFollow:        socialList[i].IsFollow,
+			Avatar:          userList[i].Avatar,
+			BackgroundImage: userList[i].BackGroundImage,
+			Signature:       userList[i].Signature,
+			TotalFavorited:  interactionList[i].TotalFavorited,
+			WorkCount:       interactionList[i].WorkCount,
+			FavoriteCount:   interactionList[i].FavoriteCount,
+		})
+	}
+	resp.BaseResp = &base.DouyinBaseResponse{
+		StatusCode: 200,
+		StatusMsg:  "batch get followList success",
+	}
+	return resp, nil
+
 }
 
 // GetFriendList implements the UserServiceImpl interface.
 func (s *UserServiceImpl) GetFriendList(ctx context.Context, req *user.DouyinGetRelationFriendListRequest) (resp *user.DouyinGetRelationFriendListResponse, err error) {
-	// TODO: Your code here...
-	return
+	resp = new(user.DouyinGetRelationFriendListResponse)
+
+	userIdlist, err := s.SocialManager.GetRelationList(ctx, req.ViewerId, req.OwnerId, consts.FriendsList)
+	if err != nil {
+		klog.Errorf("user socialManager get follow list failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "user socialManager get followList failed ",
+		}
+		return resp, err
+	}
+	userList, err := s.RedisManager.BatchGetUserById(ctx, userIdlist)
+	if err != nil {
+		klog.Errorf("user redis get user failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "user redis get user failed ",
+		}
+		return resp, err
+	}
+	socialList, err := s.SocialManager.BatchGetSocialInfo(ctx, req.ViewerId, userIdlist)
+	if err != nil {
+		klog.Errorf("user socialManager get socialList failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "user socialManager get socialList failed",
+		}
+		return resp, err
+	}
+	interactionList, err := s.InteractionManager.BatchGetInteractInfo(ctx, userIdlist)
+	if err != nil {
+		klog.Errorf("user interactionManager get interactionList failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "user interactionManager get interactionList failed",
+		}
+		return resp, err
+	}
+	for i := 0; i <= len(userList)-1; i++ {
+		resp.UserList = append(resp.UserList, &base.FriendUser{
+			Id:              userList[i].ID,
+			Name:            userList[i].Username,
+			FollowCount:     socialList[i].FollowCount,
+			FollowerCount:   socialList[i].FollowerCount,
+			IsFollow:        socialList[i].IsFollow,
+			Avatar:          userList[i].Avatar,
+			BackgroundImage: userList[i].BackGroundImage,
+			Signature:       userList[i].Signature,
+			TotalFavorited:  interactionList[i].TotalFavorited,
+			WorkCount:       interactionList[i].WorkCount,
+			FavoriteCount:   interactionList[i].FavoriteCount,
+		})
+	}
+	resp.BaseResp = &base.DouyinBaseResponse{
+		StatusCode: 200,
+		StatusMsg:  "batch get followList success",
+	}
+	return resp, nil
 }
