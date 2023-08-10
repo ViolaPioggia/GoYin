@@ -10,6 +10,10 @@ const (
 	KlogFilePath = "./tmp/klog/logs"
 	HlogFilePath = "./tmp/klog/logs"
 
+	NacosLogDir   = "tmp/nacos/log"
+	NacosCacheDir = "tmp/nacos/cache"
+	NacosLogLevel = "debug"
+
 	UserConfigPath = "./server/service/user/config.yaml"
 
 	RedisUserClientDB = 1

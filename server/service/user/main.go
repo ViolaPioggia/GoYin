@@ -1,10 +1,12 @@
 package main
 
 import (
+	"GoYin/server/common/middleware"
 	user "GoYin/server/kitex_gen/user/userservice"
 	"GoYin/server/service/user/config"
 	"GoYin/server/service/user/dao"
 	"GoYin/server/service/user/initialize"
+	"GoYin/server/service/user/pkg"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/utils"
@@ -18,9 +20,14 @@ func main() {
 	r, info := initialize.InitNacos()
 	db := initialize.InitDB()
 	rdb := initialize.InitRedis()
+	socialClient := initialize.InitSocial()
+	interactionClient := initialize.InitInteraction()
 	impl := &UserServiceImpl{
-		RedisManager: dao.NewRedisManager(rdb),
-		MysqlManager: dao.NewUser(db),
+		Jwt:                middleware.NewJWT(config.GlobalServerConfig.Name),
+		InteractionManager: pkg.NewInteractionManager(interactionClient),
+		SocialManager:      pkg.NewSocialManager(socialClient),
+		RedisManager:       dao.NewRedisManager(rdb),
+		MysqlManager:       dao.NewUser(db),
 	}
 	// Create new server.
 	srv := user.NewServer(impl,
