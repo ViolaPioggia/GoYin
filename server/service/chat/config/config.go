@@ -19,10 +19,9 @@ type MysqlConfig struct {
 	Salt     string `mapstructure:"salt" json:"salt"`
 }
 
-type RabbitMqConfig struct {
+type NsqConfig struct {
 	Host     string `mapstructure:"host" json:"host"`
-	Port     int    `mapstructure:"port" json:"port"`
-	Exchange string `mapstructure:"exchange" json:"exchange"`
+	Port     string `mapstructure:"port" json:"port"`
 	User     string `mapstructure:"user" json:"user"`
 	Password string `mapstructure:"password" json:"password"`
 }
@@ -32,10 +31,10 @@ type OtelConfig struct {
 }
 
 type ServerConfig struct {
-	Name         string         `mapstructure:"name" json:"name"`
-	Host         string         `mapstructure:"host" json:"host"`
-	Port         string         `mapstructure:"port" json:"port"`
-	MysqlInfo    MysqlConfig    `mapstructure:"mysql" json:"mysql"`
-	RabbitMqInfo RabbitMqConfig `mapstructure:"rabbitmq" json:"rabbitmq"`
-	OtelInfo     OtelConfig     `mapstructure:"otel" json:"otel"`
+	Name      string      `mapstructure:"name" json:"name"`
+	Host      string      `mapstructure:"host" json:"host"`
+	Port      string      `mapstructure:"port" json:"port"`
+	MysqlInfo MysqlConfig `mapstructure:"mysql" json:"mysql"`
+	NsqInfo   NsqConfig   `mapstructure:"nsq" json:"nsq"`
+	OtelInfo  OtelConfig  `mapstructure:"otel" json:"otel"`
 }

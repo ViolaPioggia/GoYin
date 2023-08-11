@@ -31,4 +31,7 @@ const (
 
 	SentMessage    = 1
 	ReceiveMessage = 0
+
+	NsqChatTopic   = "chat"
+	NsqChatChannel = "channel 1"
 )

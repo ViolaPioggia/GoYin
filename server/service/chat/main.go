@@ -5,6 +5,7 @@ import (
 	"GoYin/server/service/chat/config"
 	"GoYin/server/service/chat/dao"
 	"GoYin/server/service/chat/initialize"
+	"GoYin/server/service/chat/pkg"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/utils"
@@ -17,8 +18,12 @@ func main() {
 	initialize.InitLogger()
 	r, info := initialize.InitNacos()
 	db := initialize.InitDB()
+	publisher := initialize.InitProducer()
+	subscriber := initialize.InitSubscriber()
 	impl := &ChatServiceImpl{
 		MysqlManager: dao.NewMysqlManager(db),
+		Publisher:    pkg.NewPublishManager(publisher),
+		Subscriber:   pkg.NewSubscriberManager(subscriber),
 	}
 	svr := chat.NewServer(impl,
 		server.WithServiceAddr(utils.NewNetAddr("tcp", net.JoinHostPort(config.GlobalServerConfig.Host, config.GlobalServerConfig.Port))),
