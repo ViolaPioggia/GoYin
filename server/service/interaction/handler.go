@@ -15,17 +15,21 @@ import (
 // InteractionServerImpl implements the last service interface defined in the IDL.
 type InteractionServerImpl struct {
 	RedisManager
-	MysqlManager
+	FavoriteManager
+	CommentManager
 }
-type MysqlManager interface {
-	FavoriteAction(ctx context.Context, userId, videoId int64) error
-	UnFavoriteAction(ctx context.Context, userId, videoId int64) error
-	GetFavoriteVideoIdList(ctx context.Context, userId int64) ([]int64, error)
+type CommentManager interface {
 	Comment(ctx context.Context, comment *model.Comment) error
 	DeleteComment(ctx context.Context, commentId int64) error
 	GetComment(ctx context.Context, videoId int64) ([]*model.Comment, error)
-	GetFavoriteCount(ctx context.Context, videoId int64) (int64, error)
 	GetCommentCount(ctx context.Context, videoId int64) (int64, error)
+}
+
+type FavoriteManager interface {
+	FavoriteAction(ctx context.Context, userId, videoId int64) error
+	UnFavoriteAction(ctx context.Context, userId, videoId int64) error
+	GetFavoriteVideoIdList(ctx context.Context, userId int64) ([]int64, error)
+	GetFavoriteCount(ctx context.Context, videoId int64) (int64, error)
 	JudgeIsFavoriteCount(ctx context.Context, videoId, userId int64) (bool, error)
 }
 type RedisManager interface {
@@ -44,7 +48,7 @@ type RedisManager interface {
 func (s *InteractionServerImpl) Favorite(ctx context.Context, req *interaction.DouyinFavoriteActionRequest) (resp *interaction.DouyinFavoriteActionResponse, err error) {
 	resp = new(interaction.DouyinFavoriteActionResponse)
 	if req.ActionType == consts.Like {
-		if err := s.MysqlManager.FavoriteAction(ctx, req.UserId, req.VideoId); err != nil {
+		if err := s.FavoriteManager.FavoriteAction(ctx, req.UserId, req.VideoId); err != nil {
 			//回滚
 			klog.Errorf("interaction mysql favorite failed,err", err)
 			resp.BaseResp = &base.DouyinBaseResponse{
@@ -63,7 +67,7 @@ func (s *InteractionServerImpl) Favorite(ctx context.Context, req *interaction.D
 			return resp, err
 		}
 	} else if req.ActionType == consts.UnLike {
-		if err := s.MysqlManager.UnFavoriteAction(ctx, req.UserId, req.VideoId); err != nil {
+		if err := s.FavoriteManager.UnFavoriteAction(ctx, req.UserId, req.VideoId); err != nil {
 			//回滚
 			klog.Errorf("interaction mysql unFavorite failed,err", err)
 			resp.BaseResp = &base.DouyinBaseResponse{
@@ -101,7 +105,7 @@ func (s *InteractionServerImpl) GetFavoriteVideoIdList(ctx context.Context, req 
 	res, err := s.RedisManager.GetFavoriteVideoIdList(ctx, req.UserId)
 	if err != nil {
 		klog.Errorf("interaction redis get favorite video id list failed,", err)
-		res, err = s.MysqlManager.GetFavoriteVideoIdList(ctx, req.UserId)
+		res, err = s.FavoriteManager.GetFavoriteVideoIdList(ctx, req.UserId)
 		if err != nil {
 			klog.Errorf("interaction mysql get favorite video id list failed,", err)
 			resp.BaseResp = &base.DouyinBaseResponse{
@@ -143,7 +147,7 @@ func (s *InteractionServerImpl) Comment(ctx context.Context, req *interaction.Do
 	}
 
 	if req.ActionType == consts.Comment {
-		err = s.MysqlManager.Comment(ctx, comment)
+		err = s.CommentManager.Comment(ctx, comment)
 		if err != nil {
 			//回滚
 			klog.Errorf("interaction mysql comment failed,", err)
@@ -163,7 +167,7 @@ func (s *InteractionServerImpl) Comment(ctx context.Context, req *interaction.Do
 			return resp, err
 		}
 	} else if req.ActionType == consts.DeleteComment {
-		err = s.MysqlManager.DeleteComment(ctx, req.CommentId)
+		err = s.CommentManager.DeleteComment(ctx, req.CommentId)
 		if err != nil {
 			//回滚
 			klog.Errorf("interaction mysql deleteComment failed,", err)
@@ -209,7 +213,7 @@ func (s *InteractionServerImpl) GetCommentList(ctx context.Context, req *interac
 	commentList, err := s.RedisManager.GetComment(ctx, req.VideoId)
 	if err != nil {
 		klog.Errorf("interaction redis get commentList failed", err)
-		commentList, err = s.MysqlManager.GetComment(ctx, req.VideoId)
+		commentList, err = s.CommentManager.GetComment(ctx, req.VideoId)
 		if err != nil {
 			klog.Errorf("interaction mysql get commentList failed", err)
 			resp.BaseResp = &base.DouyinBaseResponse{
@@ -289,7 +293,7 @@ func (s *InteractionServerImpl) getVideoInfo(ctx context.Context, videoId, userI
 	CommentNum, err = s.RedisManager.GetCommentCount(ctx, videoId)
 	if err != nil {
 		klog.Errorf("interaction get video comment num failed,", err)
-		CommentNum, err = s.MysqlManager.GetCommentCount(ctx, videoId)
+		CommentNum, err = s.CommentManager.GetCommentCount(ctx, videoId)
 		if err != nil {
 			klog.Errorf("interaction get video comment num failed,", err)
 			return CommentNum, FavoriteNum, IsFavorite, err
@@ -298,7 +302,7 @@ func (s *InteractionServerImpl) getVideoInfo(ctx context.Context, videoId, userI
 	FavoriteNum, err = s.RedisManager.GetFavoriteCount(ctx, videoId)
 	if err != nil {
 		klog.Errorf("interaction get video favorite num failed,", err)
-		CommentNum, err = s.MysqlManager.GetFavoriteCount(ctx, videoId)
+		CommentNum, err = s.FavoriteManager.GetFavoriteCount(ctx, videoId)
 		if err != nil {
 			klog.Errorf("interaction get favorite num failed,", err)
 			return CommentNum, FavoriteNum, IsFavorite, err
@@ -307,7 +311,7 @@ func (s *InteractionServerImpl) getVideoInfo(ctx context.Context, videoId, userI
 	IsFavorite, err = s.RedisManager.JudgeIsFavoriteCount(ctx, videoId, userId)
 	if err != nil {
 		klog.Errorf("interaction judge isFavorite failed,", err)
-		IsFavorite, err = s.MysqlManager.JudgeIsFavoriteCount(ctx, videoId, userId)
+		IsFavorite, err = s.FavoriteManager.JudgeIsFavoriteCount(ctx, videoId, userId)
 		if err != nil {
 			klog.Errorf("interaction judge isFavorite failed,", err)
 			return CommentNum, FavoriteNum, IsFavorite, err
