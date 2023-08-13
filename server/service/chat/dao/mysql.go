@@ -11,6 +11,11 @@ type MysqlManager struct {
 	db *gorm.DB
 }
 
+func (m MysqlManager) HandleMessage(ctx context.Context, msg string, userId, toUserId, time int64) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m MysqlManager) GetHistoryMessage(ctx context.Context, userId, toUserId, time int64) ([]*model.Message, error) {
 	//TODO implement me
 	panic("implement me")

@@ -4,6 +4,7 @@ import (
 	"GoYin/server/common/consts"
 	"GoYin/server/kitex_gen/base"
 	chat "GoYin/server/kitex_gen/chat"
+	"GoYin/server/service/chat/dao"
 	"GoYin/server/service/chat/model"
 	"context"
 	"github.com/cloudwego/kitex/pkg/klog"
@@ -19,12 +20,13 @@ type Publisher interface {
 	Publish(context.Context, *chat.DouyinMessageActionRequest) error
 }
 type Subscriber interface {
-	Subscribe(ctx context.Context) (request *chat.DouyinMessageActionRequest, err error)
+	Subscribe(ctx context.Context, dao *dao.MysqlManager) (err error)
 }
 type MysqlManager interface {
 	GetHistoryMessage(ctx context.Context, userId, toUserId, time int64) ([]*model.Message, error)
 	GetLatestMessage(ctx context.Context, userId, toUserId int64) (*model.Message, error)
 	BatchGetLatestMessage(ctx context.Context, userId int64, toUserIdList []int64) ([]*model.Message, error)
+	HandleMessage(ctx context.Context, msg string, userId, toUserId, time int64) error
 }
 
 // GetChatHistory implements the ChatServiceImpl interface.

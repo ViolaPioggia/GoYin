@@ -6,11 +6,12 @@ import (
 	"GoYin/server/service/chat/dao"
 	"GoYin/server/service/chat/initialize"
 	"GoYin/server/service/chat/pkg"
+	"context"
+	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/utils"
 	"github.com/cloudwego/kitex/server"
-	"log"
 	"net"
 )
 
@@ -20,6 +21,12 @@ func main() {
 	db := initialize.InitDB()
 	publisher := initialize.InitProducer()
 	subscriber := initialize.InitSubscriber()
+	go func() {
+		err := pkg.SubscriberManager.Subscribe(*pkg.NewSubscriberManager(subscriber), context.Background(), dao.NewMysqlManager(db))
+		if err != nil {
+			klog.Error(err)
+		}
+	}()
 	impl := &ChatServiceImpl{
 		MysqlManager: dao.NewMysqlManager(db),
 		Publisher:    pkg.NewPublishManager(publisher),
@@ -35,6 +42,6 @@ func main() {
 	err := svr.Run()
 
 	if err != nil {
-		log.Println(err.Error())
+		klog.Error(err)
 	}
 }
