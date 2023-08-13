@@ -5,6 +5,7 @@ import (
 	"GoYin/server/service/interaction/config"
 	"GoYin/server/service/interaction/dao"
 	"GoYin/server/service/interaction/initialize"
+	"GoYin/server/service/interaction/pkg"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/utils"
@@ -18,7 +19,9 @@ func main() {
 	r, info := initialize.InitNacos()
 	db := initialize.InitDB()
 	rdb := initialize.InitRedis()
+	videoClient := initialize.InitVideo()
 	impl := &InteractionServerImpl{
+		VideoManager:    pkg.NewVideoManager(videoClient),
 		RedisManager:    dao.NewRedisManager(rdb),
 		CommentManager:  dao.NewMysqlManager(db),
 		FavoriteManager: dao.NewMysqlManager(db),

@@ -17,6 +17,10 @@ type InteractionServerImpl struct {
 	RedisManager
 	FavoriteManager
 	CommentManager
+	VideoManager
+}
+type VideoManager interface {
+	GetPublishedVideoIdList(ctx context.Context, userId int64) ([]int64, error)
 }
 type CommentManager interface {
 	Comment(ctx context.Context, comment *model.Comment) error
@@ -31,6 +35,8 @@ type FavoriteManager interface {
 	GetFavoriteVideoIdList(ctx context.Context, userId int64) ([]int64, error)
 	GetFavoriteCount(ctx context.Context, videoId int64) (int64, error)
 	JudgeIsFavoriteCount(ctx context.Context, videoId, userId int64) (bool, error)
+	GetFavoriteCountByVideoId(videoId int64) (int64, error)
+	GetFavoriteVideoCountByUserId(userId int64) (int64, error)
 }
 type RedisManager interface {
 	FavoriteAction(ctx context.Context, userId, videoId int64) error
@@ -322,12 +328,66 @@ func (s *InteractionServerImpl) getVideoInfo(ctx context.Context, videoId, userI
 
 // GetUserInteractInfo implements the InteractionServerImpl interface.
 func (s *InteractionServerImpl) GetUserInteractInfo(ctx context.Context, req *interaction.DouyinGetUserInteractInfoRequest) (resp *interaction.DouyinGetUserInteractInfoResponse, err error) {
-	// TODO: Your code here...
-	return
+	resp = new(interaction.DouyinGetUserInteractInfoResponse)
+
+	resp.InteractInfo, err = s.getUserInteractInfo(ctx, req.UserId)
+	if err != nil {
+		klog.Error("interaction get userInteractInfo failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "interaction get userInteractInfo failed",
+		}
+		return resp, nil
+	}
+	resp.BaseResp = &base.DouyinBaseResponse{
+		StatusCode: 200,
+		StatusMsg:  "interaction get userInteractInfo success",
+	}
+	return resp, nil
 }
 
 // BatchGetUserInteractInfo implements the InteractionServerImpl interface.
 func (s *InteractionServerImpl) BatchGetUserInteractInfo(ctx context.Context, req *interaction.DouyinBatchGetUserInteractInfoRequest) (resp *interaction.DouyinBatchGetUserInteractInfoResponse, err error) {
-	// TODO: Your code here...
-	return
+	resp = new(interaction.DouyinBatchGetUserInteractInfoResponse)
+
+	for _, v := range req.UserIdList {
+		info, err := s.getUserInteractInfo(ctx, v)
+		if err != nil {
+			klog.Error("interaction batch get userInteractInfo failed,", err)
+			resp.BaseResp = &base.DouyinBaseResponse{
+				StatusCode: 500,
+				StatusMsg:  "interaction batch get userInteractInfo failed",
+			}
+			return resp, err
+		}
+		resp.InteractInfoList = append(resp.InteractInfoList, info)
+	}
+	resp.BaseResp = &base.DouyinBaseResponse{
+		StatusCode: 200,
+		StatusMsg:  "interaction batch get userInteractInfo success",
+	}
+	return resp, nil
+}
+
+// BatchGetUserInteractInfo implements the InteractionServerImpl interface.
+func (s *InteractionServerImpl) getUserInteractInfo(ctx context.Context, userId int64) (info *base.UserInteractInfo, err error) {
+	info = new(base.UserInteractInfo)
+	videoIdList, err := s.VideoManager.GetPublishedVideoIdList(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	info.WorkCount = int64(len(videoIdList))
+	for _, vid := range videoIdList {
+		count, err := s.FavoriteManager.GetFavoriteCountByVideoId(vid)
+		if err != nil {
+			return nil, err
+		}
+		info.TotalFavorited += count
+	}
+
+	info.FavoriteCount, err = s.FavoriteManager.GetFavoriteVideoCountByUserId(userId)
+	if err != nil {
+		return nil, err
+	}
+	return info, nil
 }

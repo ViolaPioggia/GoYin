@@ -25,13 +25,11 @@ type RedisConfig struct {
 	Password string `mapstructure:"password" json:"password"`
 }
 
-type RabbitMqConfig struct {
-	Host             string `mapstructure:"host" json:"host"`
-	Port             int    `mapstructure:"port" json:"port"`
-	CommentExchange  string `mapstructure:"comment_exchange" json:"comment_exchange"`
-	FavoriteExchange string `mapstructure:"favorite_exchange" json:"favorite_exchange"`
-	User             string `mapstructure:"user" json:"user"`
-	Password         string `mapstructure:"password" json:"password"`
+type NsqConfig struct {
+	Host     string `mapstructure:"host" json:"host"`
+	Port     string `mapstructure:"port" json:"port"`
+	User     string `mapstructure:"user" json:"user"`
+	Password string `mapstructure:"password" json:"password"`
 }
 
 type OtelConfig struct {
@@ -44,7 +42,7 @@ type ServerConfig struct {
 	Port         string         `mapstructure:"port" json:"port"`
 	MysqlInfo    MysqlConfig    `mapstructure:"mysql" json:"mysql"`
 	RedisInfo    RedisConfig    `mapstructure:"redis" json:"redis"`
-	RabbitMqInfo RabbitMqConfig `mapstructure:"rabbitmq" json:"rabbitmq"`
+	NsqInfo      NsqConfig      `mapstructure:"nsq" json:"nsq"`
 	OtelInfo     OtelConfig     `mapstructure:"otel" json:"otel"`
 	VideoSrvInfo VideoSrvConfig `mapstructure:"video_srv" json:"video_srv"`
 }
