@@ -14,6 +14,16 @@ type MysqlManager struct {
 	favoriteDb *gorm.DB
 }
 
+func (m MysqlManager) GetFavoriteCountByVideoId(videoId int64) (int64, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m MysqlManager) GetFavoriteVideoCountByUserId(userId int64) (int64, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m MysqlManager) FavoriteAction(ctx context.Context, userId, videoId int64) error {
 	tx := m.favoriteDb.Begin()
 
