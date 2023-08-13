@@ -4,6 +4,7 @@ const (
 	UserSnowflakeNode    = 1
 	NacosSnowflakeNode   = 2
 	CommentSnowFlakeNode = 3
+	VideoSnowFlakeNode   = 4
 
 	MysqlAlreadyExists = "useralreadyexists"
 
