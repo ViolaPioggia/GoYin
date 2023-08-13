@@ -9,7 +9,7 @@ const (
 	MysqlAlreadyExists = "useralreadyexists"
 
 	KlogFilePath = "./tmp/klog/logs"
-	HlogFilePath = "./tmp/klog/logs"
+	HlogFilePath = "./tmp/hlog/logs"
 
 	NacosLogDir   = "tmp/nacos/log"
 	NacosCacheDir = "tmp/nacos/cache"
@@ -33,6 +33,8 @@ const (
 	SentMessage    = 1
 	ReceiveMessage = 0
 
-	NsqChatTopic   = "chat"
-	NsqChatChannel = "channel 1"
+	NsqChatTopic    = "chat"
+	NsqVideoTopic   = "video"
+	NsqChatChannel  = "channel 1"
+	NsqVideoChannel = "channel 2"
 )
