@@ -1,8 +1,8 @@
 package model
 
 type Favorite struct {
-	UserId     int64 `gorm:"not null"`
-	VideoId    int64 `gorm:"not null"`
+	UserId     int64 `gorm:"not null;index:idx_user_video"`
+	VideoId    int64 `gorm:"not null;index:idx_user_video"`
 	ActionType int8  `gorm:"type:tinyint;not null"`
 	CreateDate int64 `gorm:"not null"`
 }
