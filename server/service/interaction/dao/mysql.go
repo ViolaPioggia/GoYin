@@ -4,6 +4,7 @@ import (
 	"GoYin/server/common/consts"
 	"GoYin/server/service/interaction/model"
 	"context"
+	"errors"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"gorm.io/gorm"
 	"time"
@@ -15,16 +16,62 @@ type MysqlManager struct {
 }
 
 func (m MysqlManager) GetFavoriteCountByVideoId(videoId int64) (int64, error) {
-	//TODO implement me
-	panic("implement me")
+	if videoId < 0 {
+		err := errors.New("invalid user_id")
+		return 0, err
+	}
+	tx := m.favoriteDb.Begin()
+
+	if tx.Error != nil {
+		tx.Rollback()
+		return 0, tx.Error
+	}
+	var count int64
+	if err := m.favoriteDb.
+		Model(&model.Favorite{}).
+		Select("count(*)").
+		Where("video_id = ?", videoId).
+		Group("video_id").
+		Count(&count).Error; err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+	return count, nil
 }
 
 func (m MysqlManager) GetFavoriteVideoCountByUserId(userId int64) (int64, error) {
-	//TODO implement me
-	panic("implement me")
+	tx := m.favoriteDb.Begin()
+
+	if tx.Error != nil {
+		tx.Rollback()
+		return 0, tx.Error
+	}
+	var count int64
+	if err := m.favoriteDb.
+		Model(&model.Favorite{}).
+		Select("count(*)").
+		Where("user_id = ?", userId).
+		Group("user_id").
+		Count(&count).Error; err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+	return count, nil
 }
 
 func (m MysqlManager) FavoriteAction(ctx context.Context, userId, videoId int64) error {
+	if userId < 0 || videoId < 0 {
+		err := errors.New("invalid user_id or video_id")
+		return err
+	}
 	tx := m.favoriteDb.Begin()
 
 	if tx.Error != nil {
@@ -59,6 +106,10 @@ func (m MysqlManager) FavoriteAction(ctx context.Context, userId, videoId int64)
 }
 
 func (m MysqlManager) UnFavoriteAction(ctx context.Context, userId, videoId int64) error {
+	if userId < 0 || videoId < 0 {
+		err := errors.New("invalid user_id or video_id")
+		return err
+	}
 	tx := m.favoriteDb.Begin()
 
 	if tx.Error != nil {
@@ -93,6 +144,11 @@ func (m MysqlManager) UnFavoriteAction(ctx context.Context, userId, videoId int6
 }
 
 func (m MysqlManager) GetFavoriteVideoIdList(ctx context.Context, userId int64) ([]int64, error) {
+	if userId < 0 {
+		err := errors.New("invalid user_id")
+		return nil, err
+	}
+
 	tx := m.favoriteDb.Begin()
 
 	if tx.Error != nil {
@@ -123,6 +179,10 @@ func (m MysqlManager) GetFavoriteVideoIdList(ctx context.Context, userId int64) 
 }
 
 func (m MysqlManager) GetFavoriteCount(ctx context.Context, videoId int64) (int64, error) {
+	if videoId < 0 {
+		err := errors.New("invalid video_id")
+		return 0, err
+	}
 	tx := m.favoriteDb.Begin()
 
 	if tx.Error != nil {
@@ -135,7 +195,12 @@ func (m MysqlManager) GetFavoriteCount(ctx context.Context, videoId int64) (int6
 		return 0, ctx.Err()
 	default:
 		var count int64
-		err := m.favoriteDb.Model(&model.Favorite{}).Select("count(*)").Where("video_id = ?", videoId).Group("video_id").Count(&count).Error
+		err := m.favoriteDb.
+			Model(&model.Favorite{}).
+			Select("count(*)").
+			Where("video_id = ?", videoId).
+			Group("video_id").
+			Count(&count).Error
 		if err != nil {
 			tx.Rollback()
 			return 0, err
@@ -149,6 +214,10 @@ func (m MysqlManager) GetFavoriteCount(ctx context.Context, videoId int64) (int6
 }
 
 func (m MysqlManager) JudgeIsFavoriteCount(ctx context.Context, videoId, userId int64) (bool, error) {
+	if userId < 0 || videoId < 0 {
+		err := errors.New("invalid user_id or video_id")
+		return false, err
+	}
 	tx := m.favoriteDb.Begin()
 
 	if tx.Error != nil {
@@ -208,6 +277,10 @@ func (m MysqlManager) Comment(ctx context.Context, comment *model.Comment) error
 }
 
 func (m MysqlManager) DeleteComment(ctx context.Context, commentId int64) error {
+	if commentId < 0 {
+		err := errors.New("invalid comment_id")
+		return err
+	}
 	tx := m.commentDb.Begin()
 
 	if tx.Error != nil {
@@ -235,6 +308,10 @@ func (m MysqlManager) DeleteComment(ctx context.Context, commentId int64) error 
 }
 
 func (m MysqlManager) GetComment(ctx context.Context, videoId int64) ([]*model.Comment, error) {
+	if videoId < 0 {
+		err := errors.New("invalid video_id")
+		return nil, err
+	}
 	tx := m.commentDb.Begin()
 
 	if tx.Error != nil {
@@ -262,6 +339,10 @@ func (m MysqlManager) GetComment(ctx context.Context, videoId int64) ([]*model.C
 }
 
 func (m MysqlManager) GetCommentCount(ctx context.Context, videoId int64) (int64, error) {
+	if videoId < 0 {
+		err := errors.New("invalid video_id")
+		return 0, err
+	}
 	tx := m.commentDb.Begin()
 
 	if tx.Error != nil {
@@ -274,7 +355,12 @@ func (m MysqlManager) GetCommentCount(ctx context.Context, videoId int64) (int64
 		return 0, ctx.Err()
 	default:
 		var count int64
-		err := m.commentDb.Model(&model.Comment{}).Select("count(*)").Where("video_id = ?", videoId).Group("video_id").Count(&count).Error
+		err := m.commentDb.
+			Model(&model.Comment{}).
+			Select("count(*)").
+			Where("video_id = ?", videoId).
+			Group("video_id").
+			Count(&count).Error
 		if err != nil {
 			klog.Errorf("mysql select failed,", err)
 			tx.Rollback()
