@@ -71,6 +71,7 @@ github.com/bytedance/gopkg v0.0.0-20230531144706-a12972768317/go.mod h1:FtQG3YbQ
 github.com/bytedance/mockey v1.2.0/go.mod h1:+Jm/fzWZAuhEDrPXVjDf/jLM2BlLXJkwk94zf2JZ3X4=
 github.com/bytedance/mockey v1.2.1 h1:g84ngI88hz1DR4wZTL3yOuqlEcq67MretBfQUdXwrmw=
 github.com/bytedance/mockey v1.2.1/go.mod h1:+Jm/fzWZAuhEDrPXVjDf/jLM2BlLXJkwk94zf2JZ3X4=
+github.com/bytedance/sonic v1.3.5/go.mod h1:V973WhNhGmvHxW6nQmsHEfHaoU9F3zTF+93rH03hcUQ=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
 github.com/bytedance/sonic v1.8.1/go.mod h1:i736AoUSYt75HyZLoJW9ERYxcy6eaN6h4BZXU064P/U=
 github.com/bytedance/sonic v1.8.8 h1:Kj4AYbZSeENfyXicsYppYKO0K2YWab+i2UTSY7Ukz9Q=
@@ -108,6 +109,8 @@ github.com/cloudwego/fastpb v0.0.4/go.mod h1:/V13XFTq2TUkxj2qWReV8MwfPC4NnPcy6Fs
 github.com/cloudwego/frugal v0.1.3/go.mod h1:b981ViPYdhI56aFYsoMjl9kv6yeqYSO+iEz2jrhkCgI=
 github.com/cloudwego/frugal v0.1.6 h1:aXJ7W0Omion1WTCe4JHAWinQmjXDYzHt03sabu3Rabo=
 github.com/cloudwego/frugal v0.1.6/go.mod h1:9ElktKsh5qd2zDBQ5ENhPSQV7F2dZ/mXlr1eaZGDBFs=
+github.com/cloudwego/hertz v0.3.2/go.mod h1:hnv3B7eZ6kMv7CKFHT2OC4LU0mA4s5XPyu/SbixLcrU=
+github.com/cloudwego/hertz v0.6.0/go.mod h1:83EedHQvCXpveYh2r9us8YlQ1C28vPg93wPdB/QpJiA=
 github.com/cloudwego/hertz v0.6.7 h1:g2hlX/Vm6THUciZ3CAnyRyRhrEiYQ986EBGRn746m4E=
 github.com/cloudwego/hertz v0.6.7/go.mod h1:KhztQcZtMQ46gOjZcmCy557AKD29cbumGEV0BzwevwA=
 github.com/cloudwego/kitex v0.3.2/go.mod h1:/XD07VpUD9VQWmmoepASgZ6iw//vgWikVA9MpzLC5i0=
@@ -116,6 +119,7 @@ github.com/cloudwego/kitex v0.5.1/go.mod h1:B3oH+MTQ7/wBL3BrCAMlyeyjAqOpi4pRzCvQ
 github.com/cloudwego/kitex v0.6.2 h1:tGAUodPptJfV4cRCIj9uEkPxZ49rKj8Dclck+eiDUik=
 github.com/cloudwego/kitex v0.6.2/go.mod h1:zI1GBrjT0qloTikcCfQTgxg3Ws+yQMyaChEEOcGNUvA=
 github.com/cloudwego/netpoll v0.2.4/go.mod h1:1T2WVuQ+MQw6h6DpE45MohSvDTKdy2DlzCx2KsnPI4E=
+github.com/cloudwego/netpoll v0.2.6/go.mod h1:1T2WVuQ+MQw6h6DpE45MohSvDTKdy2DlzCx2KsnPI4E=
 github.com/cloudwego/netpoll v0.3.1/go.mod h1:1T2WVuQ+MQw6h6DpE45MohSvDTKdy2DlzCx2KsnPI4E=
 github.com/cloudwego/netpoll v0.3.2/go.mod h1:xVefXptcyheopwNDZjDPcfU6kIjZXZ4nY550k1yH9eQ=
 github.com/cloudwego/netpoll v0.4.0 h1:kJ2jMsT5FtlGSNtInnprJf386TFE/rGWzl8kp0wWxx4=
@@ -178,6 +182,7 @@ github.com/go-redis/redis/v8 v8.11.5 h1:AcZZR7igkdvfVmQTPnu9WE37LRrO/YrBH5zWyjDC
 github.com/go-redis/redis/v8 v8.11.5/go.mod h1:gREzHqY1hg6oD9ngVRbLStwAWKhA0FEgq8Jd4h5lpwo=
 github.com/go-sql-driver/mysql v1.7.0 h1:ueSltNNllEqE3qcWBTD0iQd3IpL/6U+mJxLkazJ7YPc=
 github.com/go-sql-driver/mysql v1.7.0/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=
+github.com/goccy/go-json v0.9.4/go.mod h1:6MelG93GURQebXPDq3khkgXZkazVtN9CRI+MGFi0w8I=
 github.com/gogo/protobuf v1.3.2/go.mod h1:P1XiOD3dCwIKUDQYPy72D8LYyHL2YPYrpS2s69NZV8Q=
 github.com/goji/httpauth v0.0.0-20160601135302-2da839ab0f4d/go.mod h1:nnjvkQ9ptGaCkuDUx6wNykzzlUixGxvkme+H/lnzb+A=
 github.com/golang-jwt/jwt v3.2.2+incompatible h1:IfV12K8xAKAnZqdXVzCZ+TOjboZ2keLg81eXfW3O+oY=
@@ -252,6 +257,7 @@ github.com/google/pprof v0.0.0-20230509042627-b1315fad0c5a h1:PEOGDI1kkyW37YqPWH
 github.com/google/pprof v0.0.0-20230509042627-b1315fad0c5a/go.mod h1:79YE0hCXdHag9sBkw2o+N/YnZtTkXi0UT9Nnixa5eYk=
 github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm40UhjYkI=
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+vpHVxEJEs9eg=
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
 github.com/googleapis/google-cloud-go-testing v0.0.0-20200911160855-bcd43fbb19e8/go.mod h1:dvDLG8qkwmyD9a/MJJN3XJcT3xFxOKAvTZGvuZmac9g=
@@ -271,6 +277,12 @@ github.com/henrylee2cn/ameda v1.4.10 h1:JdvI2Ekq7tapdPsuhrc4CaFiqw6QXFvZIULWJgQy
 github.com/henrylee2cn/ameda v1.4.10/go.mod h1:liZulR8DgHxdK+MEwvZIylGnmcjzQ6N6f2PlWe7nEO4=
 github.com/henrylee2cn/goutil v0.0.0-20210127050712-89660552f6f8 h1:yE9ULgp02BhYIrO6sdV/FPe0xQM6fNHkVQW2IAymfM0=
 github.com/henrylee2cn/goutil v0.0.0-20210127050712-89660552f6f8/go.mod h1:Nhe/DM3671a5udlv2AdV2ni/MZzgfv2qrPL5nIi3EGQ=
+github.com/hertz-contrib/obs-opentelemetry/logging/logrus v0.1.1 h1:4KR/JoIc8PSbVucOzsLSJOtVgDowwNG6/C/GkrpPXHI=
+github.com/hertz-contrib/obs-opentelemetry/logging/logrus v0.1.1/go.mod h1:dLQsSFKUVF4pya7kLlF6l1T69+mOPObotXGJO8ptbho=
+github.com/hertz-contrib/pprof v0.1.0 h1:yES6PQ5AJZRKiUQem1cpXU2gskO4cHdPMiXu9qSGS7E=
+github.com/hertz-contrib/pprof v0.1.0/go.mod h1:4vgREcobBOExepQdEt/EMD/Nc1u01rpXXaQa2TNjA4A=
+github.com/hertz-contrib/registry/nacos v0.0.0-20230731080040-f474f58b3da2 h1:Jp66cB4GwBM6jKFuGr75Em4lsLwGJ9qOvbeRUwKfhLo=
+github.com/hertz-contrib/registry/nacos v0.0.0-20230731080040-f474f58b3da2/go.mod h1:p6/bj54ITV5uEy9NQvq7b5Xnw8UzfqW+dXnj/iMBnlA=
 github.com/iancoleman/strcase v0.2.0/go.mod h1:iwCmte+B7n89clKwxIoIXy/HfoL7AsD47ZCWhYzw7ho=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
@@ -355,6 +367,8 @@ github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFR
 github.com/rogpeppe/go-internal v1.10.0 h1:TMyTOH3F/DB16zRVcYyreMH6GnZZrwQVAoYjRBZyWFQ=
 github.com/ruudk/golang-pdf417 v0.0.0-20181029194003-1af4ab5afa58/go.mod h1:6lfFZQK844Gfx8o5WFuvpxWRwnSoipWe/p622j1v06w=
 github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245/go.mod h1:pQAZKsJ8yyVxGRWYNEm9oFB8ieLgKFnamEyDmSA0BRk=
+github.com/savsgio/gotils v0.0.0-20220530130905-52f3993e8d6d h1:Q+gqLBOPkFGHyCJxXMRqtUgUbTjI8/Ze8vu8GGyNFwo=
+github.com/savsgio/gotils v0.0.0-20220530130905-52f3993e8d6d/go.mod h1:Gy+0tqhJvgGlqnTF8CVGP0AaGRjwBtXs/a5PA0Y3+A4=
 github.com/sirupsen/logrus v1.9.2 h1:oxx1eChJGI6Uks2ZC4W1zpLlVgqB8ner4EuQwV4Ik1Y=
 github.com/sirupsen/logrus v1.9.2/go.mod h1:naHLuLoDiP4jHNo9R0sCBMtWGeIprob74mVsIT4qYEQ=
 github.com/smartystreets/assertions v0.0.0-20180927180507-b2de0cb4f26d h1:zE9ykElWQ6/NYmHa3jpm/yHnI4xSofP+UP6SpjHcSeM=
@@ -392,17 +406,20 @@ github.com/subosito/gotenv v1.4.2 h1:X1TuBLAMDFbaTAChgCBLu3DU3UPyELpnF2jjJ2cz/S8
 github.com/subosito/gotenv v1.4.2/go.mod h1:ayKnFf/c6rvx/2iiLrJUk1e6plDbT3edrFNGqEflhK0=
 github.com/thrift-iterator/go v0.0.0-20190402154806-9b5a67519118/go.mod h1:60PRwE/TCI1UqLvn8v2pwAf6+yzTPLP/Ji5xaesWDqk=
 github.com/tidwall/gjson v1.9.3/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
+github.com/tidwall/gjson v1.12.1/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
 github.com/tidwall/gjson v1.13.0 h1:3TFY9yxOQShrvmjdM76K+jc66zJeT6D3/VFFYCGQf7M=
 github.com/tidwall/gjson v1.13.0/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
 github.com/tidwall/match v1.1.1 h1:+Ho715JplO36QYgwN9PGYNhgZvoUSc9X2c80KVTi+GA=
 github.com/tidwall/match v1.1.1/go.mod h1:eRSPERbgtNPcGhD8UCthc6PmLEQXEWd3PRB5JTxsfmM=
 github.com/tidwall/pretty v1.2.0 h1:RWIZEg2iJ8/g6fDDYzMpobmaoGh5OLl4AXtGUGPcqCs=
 github.com/tidwall/pretty v1.2.0/go.mod h1:ITEVvHYasfjBbM0u2Pg8T2nJnzm8xPwvNhhsoaGGjNU=
+github.com/tidwall/sjson v1.2.4/go.mod h1:098SZ494YoMWPmMO6ct4dcFnqxwj9r/gF0Etp19pSNM=
 github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS4MhqMhdFk5YI=
 github.com/twitchyliquid64/golang-asm v0.15.1/go.mod h1:a1lVb/DtPvCB8fslRZhAngC2+aY1QWCk3Cedj/Gdt08=
 github.com/v2pro/plz v0.0.0-20221028024117-e5f9aec5b631/go.mod h1:3gacX+hQo+xvl0vtLqCMufzxuNCwt4geAVOMt2LQYfE=
 github.com/v2pro/quokka v0.0.0-20171201153428-382cb39c6ee6/go.mod h1:0VP5W9AFNVWU8C1QLNeVg8TvzoEkIHWZ4vxtxEVFWUY=
 github.com/v2pro/wombat v0.0.0-20180402055224-a56dbdcddef2/go.mod h1:wen8nMxrRrUmXnRwH+3wGAW+hyYTHcOrTNhMpxyp/i0=
+github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

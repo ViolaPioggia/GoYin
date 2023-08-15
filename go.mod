@@ -10,6 +10,9 @@ require (
 	github.com/cloudwego/kitex v0.6.2
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/hertz-contrib/obs-opentelemetry/logging/logrus v0.1.1
+	github.com/hertz-contrib/pprof v0.1.0
+	github.com/hertz-contrib/registry/nacos v0.0.0-20230731080040-f474f58b3da2
 	github.com/kitex-contrib/obs-opentelemetry v0.2.3
 	github.com/kitex-contrib/obs-opentelemetry/logging/logrus v0.0.0-20230530060140-c76e27f58391
 	github.com/kitex-contrib/registry-nacos v0.1.0
@@ -64,6 +67,7 @@ require (
 	github.com/oleiade/lane v1.0.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/savsgio/gotils v0.0.0-20220530130905-52f3993e8d6d // indirect
 	github.com/sirupsen/logrus v1.9.2 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
 	github.com/spf13/cast v1.5.1 // indirect

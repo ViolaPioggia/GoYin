@@ -16,6 +16,7 @@ const (
 	NacosLogLevel = "debug"
 
 	UserConfigPath = "./server/service/user/config.yaml"
+	ApiConfigPath  = "./server/service/api/config.yaml"
 
 	RedisUserClientDB = 1
 

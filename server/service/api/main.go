@@ -3,11 +3,27 @@
 package main
 
 import (
+	"GoYin/server/service/api/config"
+	"GoYin/server/service/api/initialize"
+	"GoYin/server/service/api/initialize/rpc"
+	"fmt"
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/hertz-contrib/pprof"
 )
 
 func main() {
-	h := server.Default()
+	// initialize
+	initialize.InitLogger()
+	r, info := initialize.InitNacos()
+	rpc.Init()
+	// create a new server
+	h := server.New(
+		server.WithHostPorts(fmt.Sprintf(":%d", config.GlobalServerConfig.Port)),
+		server.WithRegistry(r, info),
+		server.WithHandleMethodNotAllowed(true),
+	)
+	// use pprof & tracer mw
+	pprof.Register(h)
 
 	register(h)
 	h.Spin()
