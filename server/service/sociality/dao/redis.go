@@ -10,7 +10,7 @@ type RedisManager struct {
 	redisClient *redis.Client
 }
 
-func (r RedisManager) Action(ctx context.Context, userId, toUserId int64) error {
+func (r RedisManager) Action(ctx context.Context, userId, toUserId int64, actionType int8) error {
 	//TODO implement me
 	panic("implement me")
 }

@@ -11,6 +11,11 @@ type MysqlManager struct {
 	db *gorm.DB
 }
 
+func (m MysqlManager) Action(ctx context.Context, userId, toUserId int64, actionType int8) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m MysqlManager) GetUserIdList(ctx context.Context, userId int64, option int8) ([]int64, error) {
 	//TODO implement me
 	panic("implement me")

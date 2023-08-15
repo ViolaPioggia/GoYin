@@ -9,13 +9,14 @@ import (
 )
 
 type RedisManager interface {
-	Action(ctx context.Context, userId, toUserId int64) error
+	Action(ctx context.Context, userId, toUserId int64, actionType int8) error
 	GetUserIdList(ctx context.Context, userId int64, option int8) ([]int64, error)
 	GetSocialInfo(ctx context.Context, userId int64) (*model.SocialInfo, error)
 	BatchGetSocialInfo(ctx context.Context, userId []int64) ([]*model.SocialInfo, error)
 }
 
 type MysqlManager interface {
+	Action(ctx context.Context, userId, toUserId int64, actionType int8) error
 	GetUserIdList(ctx context.Context, userId int64, option int8) ([]int64, error)
 	GetSocialInfo(ctx context.Context, userId int64) (*model.SocialInfo, error)
 	BatchGetSocialInfo(ctx context.Context, userId []int64) ([]*model.SocialInfo, error)
@@ -38,7 +39,7 @@ func (s *SocialityServiceImpl) Action(ctx context.Context, req *sociality.Douyin
 		return resp, nil
 	}
 
-	err = s.RedisManager.Action(ctx, req.UserId, req.ToUserId)
+	err = s.RedisManager.Action(ctx, req.UserId, req.ToUserId, req.ActionType)
 	if err != nil {
 		klog.Errorf("sociality redis action failed", err)
 		resp.BaseResp = &base.DouyinBaseResponse{
