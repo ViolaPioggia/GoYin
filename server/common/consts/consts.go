@@ -24,6 +24,9 @@ const (
 	FollowerList = 1
 	FriendsList  = 2
 
+	Follow   = 1
+	UnFollow = 2
+
 	IsLike = 1
 	Like   = 1
 	UnLike = 2
