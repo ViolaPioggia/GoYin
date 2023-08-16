@@ -146,8 +146,8 @@ func (r RedisManager) JudgeIsFavoriteCount(ctx context.Context, videoId, userId 
 		if v == strconv.FormatInt(videoId, 10) {
 			return true, nil
 		}
-		return false, nil
 	}
+	return false, nil
 }
 
 func NewRedisManager(client *redis.Client) *RedisManager {

@@ -16,12 +16,12 @@ func (m MysqlManager) GetUserIdList(ctx context.Context, userId int64, option in
 	panic("implement me")
 }
 
-func (m MysqlManager) GetSocialInfo(ctx context.Context, userId int64) (*model.SocialInfo, error) {
+func (m MysqlManager) GetSocialInfo(ctx context.Context, userId int64, viewerId int64) (*model.SocialInfo, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (m MysqlManager) BatchGetSocialInfo(ctx context.Context, userId []int64) ([]*model.SocialInfo, error) {
+func (m MysqlManager) BatchGetSocialInfo(ctx context.Context, userId []int64, viewerId int64) ([]*model.SocialInfo, error) {
 	//TODO implement me
 	panic("implement me")
 }

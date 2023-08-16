@@ -11,15 +11,15 @@ import (
 type RedisManager interface {
 	Action(ctx context.Context, userId, toUserId int64, actionType int8) error
 	GetUserIdList(ctx context.Context, userId int64, option int8) ([]int64, error)
-	GetSocialInfo(ctx context.Context, userId int64) (*model.SocialInfo, error)
-	BatchGetSocialInfo(ctx context.Context, userId []int64) ([]*model.SocialInfo, error)
+	GetSocialInfo(ctx context.Context, userId int64, viewerId int64) (*model.SocialInfo, error)
+	BatchGetSocialInfo(ctx context.Context, userId []int64, viewerId int64) ([]*model.SocialInfo, error)
 }
 
 type MysqlManager interface {
 	HandleSocialInfo(ctx context.Context, userId int64, toUserId int64, actionType int8) error
 	GetUserIdList(ctx context.Context, userId int64, option int8) ([]int64, error)
-	GetSocialInfo(ctx context.Context, userId int64) (*model.SocialInfo, error)
-	BatchGetSocialInfo(ctx context.Context, userId []int64) ([]*model.SocialInfo, error)
+	GetSocialInfo(ctx context.Context, userId int64, viewerId int64) (*model.SocialInfo, error)
+	BatchGetSocialInfo(ctx context.Context, userId []int64, viewerId int64) ([]*model.SocialInfo, error)
 }
 type Publisher interface {
 	Publish(ctx context.Context, req *sociality.DouyinRelationActionRequest) error
@@ -94,10 +94,10 @@ func (s *SocialityServiceImpl) GetRelationIdList(ctx context.Context, req *socia
 func (s *SocialityServiceImpl) GetSocialInfo(ctx context.Context, req *sociality.DouyinGetSocialInfoRequest) (resp *sociality.DouyinGetSocialInfoResponse, err error) {
 	resp = new(sociality.DouyinGetSocialInfoResponse)
 
-	socialInfo, err := s.RedisManager.GetSocialInfo(ctx, req.OwnerId)
+	socialInfo, err := s.RedisManager.GetSocialInfo(ctx, req.OwnerId, req.ViewerId)
 	if err != nil {
 		klog.Errorf("sociality redis get socialInfo failed,", err)
-		socialInfo, err = s.MysqlManager.GetSocialInfo(ctx, req.OwnerId)
+		socialInfo, err = s.MysqlManager.GetSocialInfo(ctx, req.OwnerId, req.ViewerId)
 		if err != nil {
 			klog.Errorf("sociality mysql get socialInfo failed,", err)
 			resp.BaseResp = &base.DouyinBaseResponse{
@@ -123,10 +123,10 @@ func (s *SocialityServiceImpl) GetSocialInfo(ctx context.Context, req *sociality
 func (s *SocialityServiceImpl) BatchGetSocialInfo(ctx context.Context, req *sociality.DouyinBatchGetSocialInfoRequest) (resp *sociality.DouyinBatchGetSocialInfoResponse, err error) {
 	resp = new(sociality.DouyinBatchGetSocialInfoResponse)
 
-	socialInfos, err := s.RedisManager.BatchGetSocialInfo(ctx, req.OwnerIdList)
+	socialInfos, err := s.RedisManager.BatchGetSocialInfo(ctx, req.OwnerIdList, req.ViewerId)
 	if err != nil {
 		klog.Errorf("sociality redis batch get socialInfo failed,", err)
-		socialInfos, err = s.MysqlManager.BatchGetSocialInfo(ctx, req.OwnerIdList)
+		socialInfos, err = s.MysqlManager.BatchGetSocialInfo(ctx, req.OwnerIdList, req.ViewerId)
 		if err != nil {
 			klog.Errorf("sociality mysql batch get socialInfo failed,", err)
 			resp.BaseResp = &base.DouyinBaseResponse{
