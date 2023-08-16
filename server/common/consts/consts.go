@@ -40,7 +40,9 @@ const (
 	NsqChatTopic        = "chat"
 	NsqVideoTopic       = "video"
 	NsqSocialityTopic   = "sociality"
+	NsqApiTopic         = "api"
 	NsqChatChannel      = "channel 1"
 	NsqVideoChannel     = "channel 2"
 	NsqSocialityChannel = "channel 3"
+	NsqApiChannel       = "channel 4"
 )
