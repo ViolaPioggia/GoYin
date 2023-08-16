@@ -1,7 +1,7 @@
 package initialize
 
 import (
-	"GoYin/server/service/user/config"
+	"GoYin/server/service/chat/config"
 	"fmt"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"gorm.io/driver/mysql"

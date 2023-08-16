@@ -18,7 +18,7 @@ import (
 
 func InitNacos() (registry.Registry, *registry.Info) {
 	v := viper.New()
-	v.SetConfigFile(consts.UserConfigPath)
+	v.SetConfigFile(consts.InteractionConfigPath)
 	if err := v.ReadInConfig(); err != nil {
 		klog.Fatalf("read viper config failed: %s", err)
 	}

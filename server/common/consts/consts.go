@@ -15,8 +15,12 @@ const (
 	NacosCacheDir = "tmp/nacos/cache"
 	NacosLogLevel = "debug"
 
-	UserConfigPath = "./server/service/user/config.yaml"
-	ApiConfigPath  = "./server/service/api/config.yaml"
+	UserConfigPath        = "./server/service/user/config.yaml"
+	SocialityConfigPath   = "./server/service/sociality/config.yaml"
+	InteractionConfigPath = "./server/service/interaction/config.yaml"
+	VideoConfigPath       = "./server/service/video/config.yaml"
+	ChatConfigPath        = "./server/service/chat/config.yaml"
+	ApiConfigPath         = "./server/service/api/config.yaml"
 
 	RedisUserClientDB = 1
 
@@ -41,8 +45,8 @@ const (
 	NsqVideoTopic       = "video"
 	NsqSocialityTopic   = "sociality"
 	NsqApiTopic         = "api"
-	NsqChatChannel      = "channel 1"
-	NsqVideoChannel     = "channel 2"
-	NsqSocialityChannel = "channel 3"
-	NsqApiChannel       = "channel 4"
+	NsqChatChannel      = "1"
+	NsqVideoChannel     = "2"
+	NsqSocialityChannel = "3"
+	NsqApiChannel       = "4"
 )

@@ -48,7 +48,7 @@ func (s SubscriberManager) Subscribe(ctx context.Context, dao *dao.MysqlManager)
 		return nil
 	}))
 
-	err = s.Subscriber.ConnectToNSQD(config.GlobalServerConfig.Host + ":" + config.GlobalServerConfig.Port)
+	err = s.Subscriber.ConnectToNSQD(config.GlobalServerConfig.NsqInfo.Host + ":" + config.GlobalServerConfig.NsqInfo.Port)
 	if err != nil {
 		klog.Error(err)
 	}

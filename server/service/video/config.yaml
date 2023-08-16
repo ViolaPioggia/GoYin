@@ -1,0 +1,8 @@
+# Configure according to Nacos configuration.
+host: '162.14.78.209'
+port: 8848
+namespace: 'cddf6fc0-297e-48c5-a852-e3b9a93b6435'
+user: 'nacos'
+password: '3G'
+dataid: 'interaction_srv'
+group: 'INTERACTION_GROUP'
