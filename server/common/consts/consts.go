@@ -37,8 +37,10 @@ const (
 	SentMessage    = 1
 	ReceiveMessage = 0
 
-	NsqChatTopic    = "chat"
-	NsqVideoTopic   = "video"
-	NsqChatChannel  = "channel 1"
-	NsqVideoChannel = "channel 2"
+	NsqChatTopic        = "chat"
+	NsqVideoTopic       = "video"
+	NsqSocialityTopic   = "sociality"
+	NsqChatChannel      = "channel 1"
+	NsqVideoChannel     = "channel 2"
+	NsqSocialityChannel = "channel 3"
 )

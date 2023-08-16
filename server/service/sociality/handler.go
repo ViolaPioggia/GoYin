@@ -16,14 +16,18 @@ type RedisManager interface {
 }
 
 type MysqlManager interface {
-	Action(ctx context.Context, userId, toUserId int64, actionType int8) error
+	HandleSocialInfo(ctx context.Context, userId int64, toUserId int64, actionType int8) error
 	GetUserIdList(ctx context.Context, userId int64, option int8) ([]int64, error)
 	GetSocialInfo(ctx context.Context, userId int64) (*model.SocialInfo, error)
 	BatchGetSocialInfo(ctx context.Context, userId []int64) ([]*model.SocialInfo, error)
 }
+type Publisher interface {
+	Publish(ctx context.Context, req *sociality.DouyinRelationActionRequest) error
+}
 
 // SocialityServiceImpl implements the last service interface defined in the IDL.
 type SocialityServiceImpl struct {
+	Publisher
 	RedisManager
 	MysqlManager
 }
@@ -38,7 +42,15 @@ func (s *SocialityServiceImpl) Action(ctx context.Context, req *sociality.Douyin
 		}
 		return resp, nil
 	}
-
+	err = s.Publisher.Publish(ctx, req)
+	if err != nil {
+		klog.Errorf("sociality publish action failed", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "sociality publish action failed",
+		}
+		return resp, err
+	}
 	err = s.RedisManager.Action(ctx, req.UserId, req.ToUserId, req.ActionType)
 	if err != nil {
 		klog.Errorf("sociality redis action failed", err)

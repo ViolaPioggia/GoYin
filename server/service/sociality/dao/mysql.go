@@ -11,11 +11,6 @@ type MysqlManager struct {
 	db *gorm.DB
 }
 
-func (m MysqlManager) Action(ctx context.Context, userId, toUserId int64, actionType int8) error {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (m MysqlManager) GetUserIdList(ctx context.Context, userId int64, option int8) ([]int64, error) {
 	//TODO implement me
 	panic("implement me")
@@ -27,6 +22,11 @@ func (m MysqlManager) GetSocialInfo(ctx context.Context, userId int64) (*model.S
 }
 
 func (m MysqlManager) BatchGetSocialInfo(ctx context.Context, userId []int64) ([]*model.SocialInfo, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m MysqlManager) HandleSocialInfo(ctx context.Context, userId int64, toUserId int64, actionType int8) error {
 	//TODO implement me
 	panic("implement me")
 }

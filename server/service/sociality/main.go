@@ -5,6 +5,9 @@ import (
 	"GoYin/server/service/sociality/config"
 	"GoYin/server/service/sociality/dao"
 	"GoYin/server/service/sociality/initialize"
+	"GoYin/server/service/sociality/pkg"
+	"context"
+	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/utils"
@@ -19,7 +22,16 @@ func main() {
 	r, info := initialize.InitNacos()
 	db := initialize.InitDB()
 	rdb := initialize.InitRedis()
+	publisherClient := initialize.InitProducer()
+	subscriberClient := initialize.InitSubscriber()
+	go func() {
+		err := pkg.SubscriberManager.Subscribe(*pkg.NewSubscriberManager(subscriberClient), context.Background(), dao.NewMysqlManager(db))
+		if err != nil {
+			klog.Error(err)
+		}
+	}()
 	impl := &SocialityServiceImpl{
+		Publisher:    pkg.NewPublishManager(publisherClient),
 		RedisManager: dao.NewRedisManager(rdb),
 		MysqlManager: dao.NewMysqlManager(db),
 	}
