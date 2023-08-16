@@ -14,12 +14,12 @@ type RedisManager struct {
 }
 
 func (r RedisManager) FavoriteAction(ctx context.Context, userId, videoId int64) error {
-	err := r.redisClient.LPush(ctx, "user_video:"+strconv.FormatInt(userId, 10), videoId).Err()
+	err := r.redisClient.LPush(ctx, "user_video_id:"+strconv.FormatInt(userId, 10), videoId).Err()
 	if err != nil {
 		klog.Error("redis lPush failed,", err)
 		return err
 	}
-	err = r.redisClient.LPush(ctx, "video_user:"+strconv.FormatInt(videoId, 10), userId).Err()
+	err = r.redisClient.LPush(ctx, "video_user_id:"+strconv.FormatInt(videoId, 10), userId).Err()
 	if err != nil {
 		klog.Error("redis lPush failed,", err)
 		return err
@@ -28,12 +28,12 @@ func (r RedisManager) FavoriteAction(ctx context.Context, userId, videoId int64)
 }
 
 func (r RedisManager) UnFavoriteAction(ctx context.Context, userId, videoId int64) error {
-	err := r.redisClient.LRem(ctx, "user_video:"+strconv.FormatInt(userId, 10), 0, videoId).Err()
+	err := r.redisClient.LRem(ctx, "user_video_id:"+strconv.FormatInt(userId, 10), 0, videoId).Err()
 	if err != nil {
 		klog.Error("redis lRem failed,", err)
 		return err
 	}
-	err = r.redisClient.LRem(ctx, "video_user:"+strconv.FormatInt(videoId, 10), 0, userId).Err()
+	err = r.redisClient.LRem(ctx, "video_user_id:"+strconv.FormatInt(videoId, 10), 0, userId).Err()
 	if err != nil {
 		klog.Error("redis lRem failed,", err)
 		return err
@@ -42,7 +42,7 @@ func (r RedisManager) UnFavoriteAction(ctx context.Context, userId, videoId int6
 }
 
 func (r RedisManager) GetFavoriteVideoIdList(ctx context.Context, userId int64) ([]int64, error) {
-	res, err := r.redisClient.LRange(ctx, "user_video:"+strconv.FormatInt(userId, 10), 0, -1).Result()
+	res, err := r.redisClient.LRange(ctx, "user_video_id:"+strconv.FormatInt(userId, 10), 0, -1).Result()
 	if err != nil {
 		klog.Error("redis get favorite videoIdList failed,", err)
 		return nil, err
@@ -119,7 +119,7 @@ func (r RedisManager) GetComment(ctx context.Context, videoId int64) ([]*model.C
 }
 
 func (r RedisManager) GetFavoriteCount(ctx context.Context, videoId int64) (int64, error) {
-	count, err := r.redisClient.LLen(ctx, "video_user:"+strconv.FormatInt(videoId, 10)).Result()
+	count, err := r.redisClient.LLen(ctx, "video_user_id:"+strconv.FormatInt(videoId, 10)).Result()
 	if err != nil {
 		klog.Error("redis get favorite count failed,", err)
 		return 0, err
@@ -137,7 +137,7 @@ func (r RedisManager) GetCommentCount(ctx context.Context, videoId int64) (int64
 }
 
 func (r RedisManager) JudgeIsFavoriteCount(ctx context.Context, videoId, userId int64) (bool, error) {
-	res, err := r.redisClient.LRange(ctx, "user_video:"+strconv.FormatInt(userId, 10), 0, -1).Result()
+	res, err := r.redisClient.LRange(ctx, "user_video_id:"+strconv.FormatInt(userId, 10), 0, -1).Result()
 	if err != nil {
 		klog.Error("redis get user_video failed,", err)
 		return false, err
