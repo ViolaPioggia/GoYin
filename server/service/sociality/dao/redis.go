@@ -68,7 +68,18 @@ func (r RedisManager) GetUserIdList(ctx context.Context, userId int64, option in
 		}
 		return followerList, nil
 	} else if option == consts.FriendsList {
-		return nil, nil
+		res, err := r.redisClient.SInter(ctx, "user_follower:"+strconv.FormatInt(userId, 10), "user_follow:"+strconv.FormatInt(userId, 10)).Result()
+		if err != nil {
+			klog.Error("redis sinter get friend failed,", err)
+			return nil, err
+		}
+		var friendList []int64
+		var friend int64
+		for _, v := range res {
+			friend, _ = strconv.ParseInt(v, 10, 64)
+			friendList = append(friendList, friend)
+		}
+		return friendList, nil
 	}
 	return nil, nil
 }
