@@ -28,7 +28,7 @@ func (u User) CreateUser(ctx context.Context, user *model.User) error {
 	default:
 		var temp model.User
 		err := u.db.Where("username = ?", user.Username).First(&temp).Error
-		if err != nil {
+		if err != gorm.ErrRecordNotFound && err != nil {
 			klog.Errorf("mysql select failed,", err)
 			tx.Rollback()
 			return err

@@ -1,12 +1,14 @@
 package pkg
 
 import (
+	"GoYin/server/service/api/config"
 	"context"
 	"github.com/minio/minio-go/v7"
 	"os"
 )
 
-func minioUpgrade(client *minio.Client) {
+func minioUpgrade() {
+	client := config.GlobalMinioClient
 	ctx := context.Background()
 
 	videoFilePath := "path/to/video.mp4"

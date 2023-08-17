@@ -6,6 +6,7 @@ import (
 	"GoYin/server/kitex_gen/sociality/socialityservice"
 	"GoYin/server/kitex_gen/user/userservice"
 	"GoYin/server/kitex_gen/video/videoservice"
+	"github.com/minio/minio-go/v7"
 )
 
 var (
@@ -17,4 +18,5 @@ var (
 	GlobalVideoClient       videoservice.Client
 	GlobalSocialClient      socialityservice.Client
 	GlobalInteractionClient interactionserver.Client
+	GlobalMinioClient       *minio.Client
 )

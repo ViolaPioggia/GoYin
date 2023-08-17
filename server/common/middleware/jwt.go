@@ -2,8 +2,12 @@ package middleware
 
 import (
 	"GoYin/server/service/api/models"
+	"context"
 	"errors"
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/golang-jwt/jwt"
+	"net/http"
 )
 
 var (
@@ -13,6 +17,37 @@ var (
 	TokenInvalid     = errors.New("couldn't handle this token")
 	TokenNotFound    = errors.New("no token")
 )
+
+func JWTAuth(secretKey string) app.HandlerFunc {
+	return func(ctx context.Context, c *app.RequestContext) {
+		token := c.Query("token")
+		if token == "" {
+			token = string(c.FormValue("token"))
+			if token == "" {
+				c.JSON(http.StatusInternalServerError, utils.H{
+					"status_code": 500,
+					"status_msg":  TokenNotFound.Error(),
+				})
+				c.Abort()
+				return
+			}
+		}
+		j := NewJWT(secretKey)
+		// Parse the information contained in the token
+		claims, err := j.ParseToken(token)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, utils.H{
+				"status_code": 500,
+				"status_msg":  err.Error(),
+			})
+			c.Abort()
+			return
+		}
+		c.Set("claims", claims)
+		c.Set("accountId", claims.ID)
+		c.Next(ctx)
+	}
+}
 
 type JWT struct {
 	SigningKey []byte

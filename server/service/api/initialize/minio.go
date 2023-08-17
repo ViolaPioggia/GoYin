@@ -8,7 +8,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
-func InitMinio() *minio.Client {
+func InitMinio() {
 	mi := config.GlobalServerConfig.MinioInfo
 	// Initialize minio client object.
 	mc, err := minio.New(mi.Endpoint, &minio.Options{
@@ -33,5 +33,5 @@ func InitMinio() *minio.Client {
 	if err != nil {
 		klog.Fatal("set bucket policy err:%s", err)
 	}
-	return mc
+	config.GlobalMinioClient = mc
 }

@@ -68,23 +68,25 @@ func (s *UserServiceImpl) Register(ctx context.Context, req *user.DouyinUserRegi
 		Signature:       "default signature",
 	}
 	err = s.MysqlManager.CreateUser(ctx, usr)
-	if err.Error() == consts.MysqlAlreadyExists {
-		resp.BaseResp = &base.DouyinBaseResponse{
-			StatusCode: 500,
-			StatusMsg:  "user already exists",
+	if err != nil {
+		if err.Error() == consts.MysqlAlreadyExists {
+			resp.BaseResp = &base.DouyinBaseResponse{
+				StatusCode: 500,
+				StatusMsg:  "user already exists",
+			}
+			return resp, err
+		} else {
+			klog.Errorf("mysql create user failed: %s", err.Error())
+			resp.BaseResp = &base.DouyinBaseResponse{
+				StatusCode: 500,
+				StatusMsg:  fmt.Sprintf("mysql create user failed: %s", err.Error()),
+			}
+			return resp, err
 		}
-		return resp, err
-	} else if err != nil {
-		klog.Errorf("mysql create user failed: %s", err.Error())
-		resp.BaseResp = &base.DouyinBaseResponse{
-			StatusCode: 500,
-			StatusMsg:  fmt.Sprintf("mysql create user failed: %s", err.Error()),
-		}
-		return resp, err
 	}
 	err = s.RedisManager.CreateUser(ctx, usr)
 	if err != nil {
-		klog.Errorf("mysql create user failed: %s", err.Error())
+		klog.Errorf("redis create user failed: %s", err.Error())
 		resp.BaseResp = &base.DouyinBaseResponse{
 			StatusCode: 500,
 			StatusMsg:  fmt.Sprintf("mysql create user failed: %s", err.Error()),
@@ -126,7 +128,7 @@ func (s *UserServiceImpl) Login(ctx context.Context, req *user.DouyinUserLoginRe
 				StatusCode: 500,
 				StatusMsg:  "no such user",
 			}
-			return resp, nil
+			return resp, err
 		} else {
 			klog.Errorf("mysql get user by username failed", err)
 			resp.BaseResp = &base.DouyinBaseResponse{
