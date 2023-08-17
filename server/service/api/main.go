@@ -15,6 +15,7 @@ func main() {
 	// initialize
 	initialize.InitLogger()
 	r, info := initialize.InitNacos()
+	minio := initialize.InitMinio()
 	rpc.Init()
 	// create a new server
 	h := server.New(

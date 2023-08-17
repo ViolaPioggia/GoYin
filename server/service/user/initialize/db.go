@@ -2,7 +2,7 @@ package initialize
 
 import (
 	"GoYin/server/common/consts"
-	"GoYin/server/service/sociality/config"
+	"GoYin/server/service/user/config"
 	"fmt"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/go-redis/redis/v8"

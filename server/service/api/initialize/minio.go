@@ -8,7 +8,7 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
-func initMinio() *minio.Client {
+func InitMinio() *minio.Client {
 	mi := config.GlobalServerConfig.MinioInfo
 	// Initialize minio client object.
 	mc, err := minio.New(mi.Endpoint, &minio.Options{
