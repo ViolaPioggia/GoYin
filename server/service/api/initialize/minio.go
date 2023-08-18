@@ -2,36 +2,18 @@ package initialize
 
 import (
 	"GoYin/server/service/api/config"
-	"context"
-	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 func InitMinio() {
-	mi := config.GlobalServerConfig.MinioInfo
-	// Initialize minio client object.
-	mc, err := minio.New(mi.Endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(mi.AccessKeyID, mi.SecretAccessKey, ""),
+	s3Client, err := minio.New(config.GlobalServerConfig.MinioInfo.Endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(config.GlobalServerConfig.MinioInfo.AccessKeyID, config.GlobalServerConfig.MinioInfo.SecretAccessKey, ""),
 		Secure: false,
 	})
 	if err != nil {
-		klog.Fatalf("create minio client err: %s", err.Error())
+		hlog.Fatal(err)
 	}
-	exists, err := mc.BucketExists(context.Background(), mi.Bucket)
-	if err != nil {
-		klog.Fatal(err)
-	}
-	if !exists {
-		err = mc.MakeBucket(context.Background(), mi.Bucket, minio.MakeBucketOptions{Region: "cn-north-1"})
-		if err != nil {
-			klog.Fatalf("make bucket err: %s", err.Error())
-		}
-	}
-	policy := `{"Version": "2012-10-17","Statement": [{"Action": ["s3:GetObject"],"Effect": "Allow","Principal": {"AWS": ["*"]},"Resource": ["arn:aws:s3:::` + mi.Bucket + `/*"],"Sid": ""}]}`
-	err = mc.SetBucketPolicy(context.Background(), mi.Bucket, policy)
-	if err != nil {
-		klog.Fatal("set bucket policy err:%s", err)
-	}
-	config.GlobalMinioClient = mc
+	config.GlobalMinioClient = s3Client
 }

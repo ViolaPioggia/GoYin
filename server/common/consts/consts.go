@@ -5,6 +5,7 @@ const (
 	NacosSnowflakeNode   = 2
 	CommentSnowFlakeNode = 3
 	VideoSnowFlakeNode   = 4
+	MinioSnowFlakeNode   = 5
 
 	MysqlAlreadyExists = "useralreadyexists"
 

@@ -3,6 +3,7 @@
 package api
 
 import (
+	"GoYin/server/common/tools"
 	"GoYin/server/kitex_gen/chat"
 	"GoYin/server/kitex_gen/interaction"
 	"GoYin/server/kitex_gen/sociality"
@@ -10,10 +11,16 @@ import (
 	"GoYin/server/kitex_gen/video"
 	"GoYin/server/service/api/biz/model/base"
 	"GoYin/server/service/api/config"
+	"GoYin/server/service/api/pkg"
 	"context"
 	"errors"
+	"github.com/bwmarrin/snowflake"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"os"
+	"strings"
+	"time"
 
+	consts2 "GoYin/server/common/consts"
 	api "GoYin/server/service/api/biz/model/api"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -200,10 +207,70 @@ func PublishVideo(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	resp := new(api.DouyinPublishActionResponse)
+	fileHeader, err := c.Request.FormFile("data")
+	s := strings.Split(fileHeader.Filename, ".")
+	s2 := s[len(s)-1:]
+	suffix := strings.Join(s2, "")
+	if err != nil {
+		resp.StatusCode = 500
+		resp.StatusMsg = "get publish video formFile failed"
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
+	sf, err := snowflake.NewNode(consts2.MinioSnowFlakeNode)
+	if err != nil {
+		hlog.Error("minio snowFlake generate failed,", err)
+		c.String(consts.StatusInternalServerError, err.Error())
+	}
+	id := sf.Generate().String()
+	uploadPathBase := time.Now().Format("2006/01/02/") + id
+	VTmpPath := "./tmp/video/" + id + "." + suffix
+	VUpPath := uploadPathBase + "." + suffix
+	CUpPath := uploadPathBase + ".png"
+	videoFile, err := os.CreateTemp("./tmp/video/", "id."+suffix)
+	if err != nil {
+		hlog.Error("tmp create video failed")
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
+	defer videoFile.Close()
+
+	mpFile, err := fileHeader.Open()
+	if err != nil {
+		hlog.Error("fileHeader open failed")
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
+	defer mpFile.Close()
+
+	_, err = videoFile.ReadFrom(mpFile)
+	if err != nil {
+		hlog.Error("readFrom from mpFile failed", err)
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
+	err = pkg.MinioUpgrade(suffix, VTmpPath, VUpPath)
+	if err != nil {
+		hlog.Error("api_srv upgrade video failed,", err)
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
+	CTmpPath, err := tools.GetVideoCover(VTmpPath)
+	if err != nil {
+		hlog.Error("api_srv upgrade minio object failed,", err)
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
+	err = pkg.MinioUpgrade(suffix, CTmpPath, CUpPath)
+	if err != nil {
+		hlog.Error("api_srv upgrade cover failed,", err)
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
 	res, err := config.GlobalVideoClient.PublishVideo(ctx, &video.DouyinPublishActionRequest{
 		UserId:   userId.(int64),
-		PlayUrl:  "",
-		CoverUrl: "",
+		PlayUrl:  config.GlobalServerConfig.MinioInfo.UrlPrefix + VUpPath,
+		CoverUrl: config.GlobalServerConfig.MinioInfo.UrlPrefix + CUpPath,
 		Title:    req.Title,
 	})
 	if err != nil {
