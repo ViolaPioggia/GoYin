@@ -44,7 +44,7 @@ func JWTAuth(secretKey string) app.HandlerFunc {
 			return
 		}
 		c.Set("claims", claims)
-		c.Set("accountId", claims.ID)
+		c.Set("userId", claims.ID)
 		c.Next(ctx)
 	}
 }

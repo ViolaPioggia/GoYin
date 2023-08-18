@@ -60,7 +60,7 @@ func (s *SocialityServiceImpl) Action(ctx context.Context, req *sociality.Douyin
 		}
 		return resp, err
 	}
-
+	resp.BaseResp = &base.DouyinBaseResponse{}
 	resp.BaseResp.StatusCode = 200
 	resp.BaseResp.StatusMsg = "sociality action success"
 	return resp, nil

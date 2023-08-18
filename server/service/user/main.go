@@ -23,7 +23,7 @@ func main() {
 	socialClient := initialize.InitSocial()
 	interactionClient := initialize.InitInteraction()
 	impl := &UserServiceImpl{
-		Jwt:                middleware.NewJWT(config.GlobalServerConfig.Name),
+		Jwt:                middleware.NewJWT(config.GlobalServerConfig.JWTInfo.SigningKey),
 		InteractionManager: pkg.NewInteractionManager(interactionClient),
 		SocialManager:      pkg.NewSocialManager(socialClient),
 		RedisManager:       dao.NewRedisManager(rdb),

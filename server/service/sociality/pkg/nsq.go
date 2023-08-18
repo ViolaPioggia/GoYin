@@ -34,12 +34,16 @@ func (p PublisherManager) Publish(ctx context.Context, req *sociality.DouyinRela
 func (s SubscriberManager) Subscribe(ctx context.Context, dao *dao.MysqlManager) (err error) {
 	s.Subscriber.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
 		var req *sociality.DouyinRelationActionRequest
-		err = sonic.Unmarshal(message.Body, req)
+		err = sonic.Unmarshal(message.Body, &req)
 		if err != nil {
 			klog.Error("subscriber unmarshal socialInfo failed,", err)
 			return err
 		}
 		err = dao.HandleSocialInfo(ctx, req.UserId, req.ToUserId, req.ActionType)
+		if err != nil {
+			klog.Error("mysql handleSocialInfo failed,", err)
+			return err
+		}
 		return nil
 	}))
 

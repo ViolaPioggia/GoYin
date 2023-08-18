@@ -6,7 +6,7 @@ import (
 	"GoYin/server/common/tools"
 	"GoYin/server/kitex_gen/base"
 	user "GoYin/server/kitex_gen/user"
-	models2 "GoYin/server/service/api/models"
+	"GoYin/server/service/api/models"
 	"GoYin/server/service/user/config"
 	"GoYin/server/service/user/model"
 	"context"
@@ -94,7 +94,7 @@ func (s *UserServiceImpl) Register(ctx context.Context, req *user.DouyinUserRegi
 		return resp, err
 	}
 	resp.UserId = usr.ID
-	resp.Token, err = s.Jwt.CreateToken(models2.CustomClaims{
+	resp.Token, err = s.Jwt.CreateToken(models.CustomClaims{
 		ID: usr.ID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Unix() + 60*60*24*30,
@@ -148,7 +148,7 @@ func (s *UserServiceImpl) Login(ctx context.Context, req *user.DouyinUserLoginRe
 	}
 
 	resp.UserId = usr.ID
-	resp.Token, err = s.Jwt.CreateToken(models2.CustomClaims{
+	resp.Token, err = s.Jwt.CreateToken(models.CustomClaims{
 		ID: usr.ID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Unix() + 60*60*24*30,

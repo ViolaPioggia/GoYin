@@ -95,6 +95,7 @@ func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 	if !flag {
 		hlog.Error("api get viewerId failed,", err)
 		c.String(consts.StatusBadRequest, errors.New("api context get viewerId failed").Error())
+		return
 	}
 	res, err := config.GlobalUserClient.GetUserInfo(ctx, &user.DouyinGetUserRequest{
 		ViewerId: viewerId.(int64),
@@ -139,6 +140,7 @@ func Feed(ctx context.Context, c *app.RequestContext) {
 	if !flag {
 		hlog.Error("api get viewerId failed,", err)
 		c.String(consts.StatusBadRequest, errors.New("api context get viewerId failed").Error())
+		return
 	}
 	resp := new(api.DouyinFeedResponse)
 	res, err := config.GlobalVideoClient.Feed(ctx, &video.DouyinFeedRequest{

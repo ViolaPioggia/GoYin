@@ -25,12 +25,16 @@ type SubscriberManager struct {
 func (s SubscriberManager) Subscribe(ctx context.Context, dao *dao.MysqlManager) (err error) {
 	s.Subscriber.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
 		var req *chat.DouyinMessageActionRequest
-		err = sonic.Unmarshal(message.Body, req)
+		err = sonic.Unmarshal(message.Body, &req)
 		if err != nil {
 			klog.Error("subscriber unmarshal message failed,", err)
 			return err
 		}
 		err = dao.HandleMessage(ctx, req.Content, req.UserId, req.ToUserId, time.Now().UnixNano())
+		if err != nil {
+			klog.Error("subscriber handleMessage failed,", err)
+			return err
+		}
 		return nil
 	}))
 

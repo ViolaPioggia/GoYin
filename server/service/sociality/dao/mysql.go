@@ -119,7 +119,7 @@ func (m MysqlManager) GetUserIdList(ctx context.Context, userId int64, option in
 		case consts.FriendsList:
 			var results []*model.ConcernList
 			err = m.db.Distinct().Select("user_id, follower_id"). //复杂查询，查找互关数据
-				Where("user_id IN (?) AND follower_id IN (?)",
+										Where("user_id IN (?) AND follower_id IN (?)",
 					m.db.Table("concern_lists").Select("user_id").Where("follower_id = ?", userId),
 					m.db.Table("concern_lists").Select("follower_id").Where("user_id = ?", userId).
 						Or("user_id = ? AND follower_id = ?", userId, userId)).
@@ -236,6 +236,7 @@ func (m MysqlManager) HandleSocialInfo(ctx context.Context, userId int64, toUser
 				tx.Rollback()
 				return err
 			}
+			return nil
 		}
 
 		return errors.New("invalid action_type")
