@@ -16,52 +16,53 @@ type MysqlManager struct {
 // IfExist 用来检测是否存在对应表
 func (m MysqlManager) isExist(userId int64, option int8) (bool, error) {
 	var temp model.ConcernList
-	if option == consts.FollowList { //关注的人
+	switch option {
+	case consts.FollowList:
 		err := m.db.Where("follower_id = ?", userId).First(&temp).Error
-		if err != nil {
-			if err == gorm.ErrRecordNotFound {
-				return false, nil
-			}
+		if err != nil && err == gorm.ErrRecordNotFound {
+			return false, nil
+		}
+		if err != nil && err != gorm.ErrRecordNotFound {
 			return false, err
 		}
+		return true, nil
 
-	} else if option == consts.FollowerList { //粉丝
+	case consts.FollowerList:
 		err := m.db.Where("user_id = ?", userId).First(&temp).Error
-		if err != nil {
-			if err == gorm.ErrRecordNotFound {
-				return false, nil
-			}
+		if err != nil && err == gorm.ErrRecordNotFound {
+			return false, nil
+		}
+		if err != nil && err != gorm.ErrRecordNotFound {
 			return false, err
 		}
-
-	} else if option == consts.FriendsList {
+		return true, nil
+	case consts.FriendsList:
 		isConcern := true
 		isFollow := true
 		flag := true
 		err1 := m.db.Where("follower_id = ?", userId).First(&temp).Error
-		if err1 != nil {
-			if err1 == gorm.ErrRecordNotFound {
-				isConcern = false //没有关注的人
-			} else {
-				flag = false
-			}
+		if err1 != nil && err1 == gorm.ErrRecordNotFound {
+			isConcern = false
+		}
+		if err1 != nil && err1 != gorm.ErrRecordNotFound {
+			flag = false
+		}
+		err2 := m.db.Where("user_id = ?", userId).First(&temp).Error
+		if err2 != nil && err2 == gorm.ErrRecordNotFound {
+			isFollow = false
+		}
+		if err2 != nil && err2 != gorm.ErrRecordNotFound {
+			flag = false
 		}
 
-		err2 := m.db.Where("user_id = ?", userId).First(&temp).Error
-		if err2 != nil {
-			if err2 == gorm.ErrRecordNotFound {
-				isFollow = false //没有粉丝
-			} else {
-				flag = false
-			}
-		}
-		if isConcern && isFollow && flag == true { //
+		if isConcern && isFollow && flag == true {
 			return true, nil
 		}
 		return false, nil
-	}
-	return false, errors.New("something wrong")
 
+	}
+
+	return false, errors.New("invalid option")
 }
 
 func (m MysqlManager) GetUserIdList(ctx context.Context, userId int64, option int8) ([]int64, error) {
@@ -84,7 +85,8 @@ func (m MysqlManager) GetUserIdList(ctx context.Context, userId int64, option in
 			return nil, nil
 		}
 
-		if option == consts.FollowList {
+		switch option {
+		case consts.FollowList:
 			var concernList []*model.ConcernList
 			if err = m.db.Where("follower_id = ?", userId).Find(&concernList).Error; err != nil {
 				tx.Rollback()
@@ -99,8 +101,7 @@ func (m MysqlManager) GetUserIdList(ctx context.Context, userId int64, option in
 				return nil, err
 			}
 			return idList, nil
-
-		} else if option == consts.FollowerList {
+		case consts.FollowerList:
 			var followerList []*model.ConcernList
 			if err = m.db.Where("user_id = ?", userId).Find(&followerList).Error; err != nil {
 				tx.Rollback()
@@ -115,8 +116,7 @@ func (m MysqlManager) GetUserIdList(ctx context.Context, userId int64, option in
 				return nil, err
 			}
 			return idList, nil
-
-		} else if option == consts.FriendsList {
+		case consts.FriendsList:
 			var results []*model.ConcernList
 			err = m.db.Distinct().Select("user_id, follower_id"). //复杂查询，查找互关数据
 				Where("user_id IN (?) AND follower_id IN (?)",
@@ -139,8 +139,8 @@ func (m MysqlManager) GetUserIdList(ctx context.Context, userId int64, option in
 				return nil, err
 			}
 			return idList, nil
-
 		}
+
 		return nil, err
 	}
 }
@@ -194,11 +194,13 @@ func (m MysqlManager) HandleSocialInfo(ctx context.Context, userId int64, toUser
 	default:
 		var temp model.ConcernList
 		err := m.db.Where("user_id = ? AND follower_id = ? ", userId, toUserId).First(&temp).Error
-		if actionType == consts.Follow { //关注（创建）
-			if err != nil && err != gorm.ErrRecordNotFound {
+		switch actionType {
+		case consts.Follow:
+			if err != nil && err != gorm.ErrRecordNotFound { //出错返回err
+				tx.Rollback()
 				return err
 			}
-			if err != nil && err == gorm.ErrRecordNotFound {
+			if err != nil && err == gorm.ErrRecordNotFound { //无数据则插入数据
 				err = m.db.Create(&model.ConcernList{
 					UserId:     userId,
 					FollowerId: toUserId,
@@ -207,16 +209,24 @@ func (m MysqlManager) HandleSocialInfo(ctx context.Context, userId int64, toUser
 					tx.Rollback()
 					return err
 				}
+				if err = tx.Commit().Error; err != nil {
+					tx.Rollback()
+					return err
+				}
+				return nil
 			}
-			return errors.New("already concern before")
-		} else if actionType == consts.UnFollow { //取关（删除）
+			//没有出错则说明表中存在数据,无需额外改动
+			return nil
+		case consts.UnFollow:
 			if err != nil && err != gorm.ErrRecordNotFound {
 				tx.Rollback()
 				return err
 			}
-			if err != nil && err == gorm.ErrRecordNotFound {
+			if err != nil && err == gorm.ErrRecordNotFound { //找不到数据则说明没有关注，不作改动
+				tx.Rollback()
 				return nil
 			}
+			//找到了数据则进行删除
 			err = m.db.Where("user_id = ? AND follower_id = ?", userId, toUserId).Delete(&model.ConcernList{}).Error
 			if err != nil {
 				tx.Rollback()
@@ -226,8 +236,8 @@ func (m MysqlManager) HandleSocialInfo(ctx context.Context, userId int64, toUser
 				tx.Rollback()
 				return err
 			}
-
 		}
+
 		return errors.New("invalid action_type")
 
 	}

@@ -7,7 +7,7 @@ type SocialInfo struct {
 }
 
 type ConcernList struct {
-	Id         int64
+	Id         int64 `gorm:"primarykey"`
 	UserId     int64
 	FollowerId int64
 }
