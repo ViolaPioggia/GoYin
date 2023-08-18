@@ -230,7 +230,7 @@ func (m MysqlManager) JudgeIsFavoriteCount(ctx context.Context, videoId, userId 
 		return false, ctx.Err()
 	default:
 		var favorite model.Favorite
-		err := m.favoriteDb.Where("user_id = ? AND video_id = ?", userId, videoId).First(&favorite).Error
+		err := m.favoriteDb.Where("user_id = ? AND video_id = ? AND action_type = ?", userId, videoId, consts.Like).First(&favorite).Error
 		if err != nil {
 			tx.Rollback()
 			return false, err

@@ -5,3 +5,9 @@ type SocialInfo struct {
 	FollowerCount int64
 	IsFollow      bool
 }
+
+type ConcernList struct {
+	Id         int64 `gorm:"primarykey"`
+	UserId     int64
+	FollowerId int64
+}
