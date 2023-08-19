@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"GoYin/server/common/consts"
-	"GoYin/server/kitex_gen/video"
 	"GoYin/server/service/video/config"
 	"GoYin/server/service/video/dao"
 	"GoYin/server/service/video/model"
@@ -38,13 +37,13 @@ func (p PublisherManager) Publish(ctx context.Context, video *model.Video) error
 
 func (s SubscriberManager) Subscribe(ctx context.Context, dao *dao.MysqlManager) (err error) {
 	s.Subscriber.AddHandler(nsq.HandlerFunc(func(message *nsq.Message) error {
-		var req *video.DouyinPublishActionRequest
-		err = sonic.Unmarshal(message.Body, req)
+		var req *model.Video
+		err = sonic.Unmarshal(message.Body, &req)
 		if err != nil {
 			klog.Error("subscriber unmarshal message failed,", err)
 			return err
 		}
-		err = dao.HandleVideo(ctx, req.UserId, req.CoverUrl, req.PlayUrl, req.Title)
+		err = dao.HandleVideo(ctx, req.ID, req.AuthorId, req.CoverUrl, req.PlayUrl, req.Title)
 		return nil
 	}))
 

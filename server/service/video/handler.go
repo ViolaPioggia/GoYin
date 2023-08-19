@@ -137,6 +137,10 @@ func (s *VideoServiceImpl) PublishVideo(ctx context.Context, req *video.DouyinPu
 		}
 		return resp, err
 	}
+	resp.BaseResp = &base.DouyinBaseResponse{
+		StatusCode: 200,
+		StatusMsg:  "publish video success",
+	}
 	return resp, nil
 }
 

@@ -143,16 +143,16 @@ func Feed(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	viewerId, flag := c.Get("userId")
-	if !flag {
-		hlog.Error("api get viewerId failed,", err)
-		c.String(consts.StatusBadRequest, errors.New("api context get viewerId failed").Error())
-		return
-	}
+	//viewerId, flag := c.Get("userId")
+	//if !flag {
+	//	hlog.Error("api get viewerId failed,", err)
+	//	c.String(consts.StatusBadRequest, errors.New("api context get viewerId failed").Error())
+	//	return
+	//}
 	resp := new(api.DouyinFeedResponse)
 	res, err := config.GlobalVideoClient.Feed(ctx, &video.DouyinFeedRequest{
 		LatestTime: req.LatestTime,
-		ViewerId:   viewerId.(int64),
+		ViewerId:   0,
 	})
 	if err != nil {
 		hlog.Error("api call video_srv failed,", err)
@@ -227,7 +227,7 @@ func PublishVideo(ctx context.Context, c *app.RequestContext) {
 	VTmpPath := "./tmp/video/" + id + "." + suffix
 	VUpPath := uploadPathBase + "." + suffix
 	CUpPath := uploadPathBase + ".png"
-	videoFile, err := os.CreateTemp("./tmp/video/", "id."+suffix)
+	videoFile, err := os.Create("./tmp/video/" + id + "." + suffix)
 	if err != nil {
 		hlog.Error("tmp create video failed")
 		c.String(consts.StatusInternalServerError, err.Error())

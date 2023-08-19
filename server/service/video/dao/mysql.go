@@ -162,7 +162,7 @@ func (m MysqlManager) PublishVideo(ctx context.Context, video *model.Video) erro
 		return nil
 	}
 }
-func (m MysqlManager) HandleVideo(ctx context.Context, userId int64, playUrl, coverUrl, title string) error {
+func (m MysqlManager) HandleVideo(ctx context.Context, videoId, userId int64, playUrl, coverUrl, title string) error {
 	tx := m.db.Begin()
 	if tx.Error != nil {
 		tx.Rollback()
@@ -174,6 +174,7 @@ func (m MysqlManager) HandleVideo(ctx context.Context, userId int64, playUrl, co
 		return ctx.Err()
 	default:
 		video := model.Video{
+			ID:         videoId,
 			AuthorId:   userId,
 			PlayUrl:    playUrl,
 			CoverUrl:   coverUrl,

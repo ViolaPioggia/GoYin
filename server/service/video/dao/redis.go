@@ -33,7 +33,7 @@ func (r RedisManager) GetBasicVideoListByLatestTime(ctx context.Context, userId,
 			return videoList, nil
 		}
 	}
-	return nil, nil
+	return videoList, nil
 }
 
 func (r RedisManager) GetPublishedVideoListByUserId(ctx context.Context, userId int64) ([]*model.Video, error) {

@@ -1,7 +1,6 @@
 package tools
 
 import (
-	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -15,8 +14,7 @@ func GetVideoCover(videoPath string) (string, error) {
 	coverFileName := videoFileName + ".jpg"
 
 	// 构造 FFmpeg 命令
-	cmd := exec.Command("ffmpeg", "-i", videoPath, "-ss", "00:00:01", "-vframes", "1", coverFileName)
-	cmd.Stderr = os.Stderr
+	cmd := exec.Command("/opt/homebrew/bin/ffmpeg", "-i", videoPath, "-ss", "00:00:01", "-vframes", "1", coverFileName)
 
 	// 执行 FFmpeg 命令
 	if err := cmd.Run(); err != nil {

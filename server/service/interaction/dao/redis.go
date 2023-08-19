@@ -71,7 +71,7 @@ func (r RedisManager) Comment(ctx context.Context, comment *model.Comment) error
 		klog.Error("redis insert comment failed,", err)
 		return err
 	}
-	err = r.redisClient.HSet(ctx, "comment:"+strconv.FormatInt(comment.ID, 10), commentJson).Err()
+	err = r.redisClient.Set(ctx, "comment:"+strconv.FormatInt(comment.ID, 10), commentJson, 0).Err()
 	if err != nil {
 		klog.Error("redis insert comment failed,", err)
 		return err
@@ -81,10 +81,11 @@ func (r RedisManager) Comment(ctx context.Context, comment *model.Comment) error
 
 func (r RedisManager) DeleteComment(ctx context.Context, commentId int64) error {
 	commentJson, err := r.redisClient.Get(ctx, "comment:"+strconv.FormatInt(commentId, 10)).Bytes()
-	if err != nil {
+	if err != nil && err != redis.Nil {
 		klog.Error("redis get commentJson failed,", err)
 		return err
 	}
+	r.redisClient.Del(ctx, "comment:"+strconv.FormatInt(commentId, 10))
 	var comment *model.Comment
 	err = sonic.Unmarshal(commentJson, &comment)
 	if err != nil {
@@ -92,7 +93,7 @@ func (r RedisManager) DeleteComment(ctx context.Context, commentId int64) error 
 		return err
 	}
 	err = r.redisClient.LRem(ctx, "video_comment:"+strconv.FormatInt(comment.VideoId, 10), 0, commentJson).Err()
-	if err != nil {
+	if err != nil && err != redis.Nil {
 		klog.Error("redis delete comment failed,", err)
 		return err
 	}
@@ -106,8 +107,8 @@ func (r RedisManager) GetComment(ctx context.Context, videoId int64) ([]*model.C
 		return nil, err
 	}
 	var commentList []*model.Comment
-	var comment *model.Comment
 	for _, v := range res {
+		var comment *model.Comment
 		err = sonic.UnmarshalString(v, &comment)
 		if err != nil {
 			klog.Error("redis unmarshal comment failed,", err)

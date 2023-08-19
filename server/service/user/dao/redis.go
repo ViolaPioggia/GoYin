@@ -33,7 +33,7 @@ func (r *RedisManager) CreateUser(ctx context.Context, user *model.User) error {
 
 func (r *RedisManager) GetUserById(ctx context.Context, id int64) (*model.User, error) {
 	userJson, err := r.redisClient.Get(ctx, "user:"+strconv.FormatInt(id, 10)).Bytes()
-	if err != nil {
+	if err != nil && err != redis.Nil {
 		klog.Error("redis get user by id failed,", err)
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (r *RedisManager) BatchGetUserById(ctx context.Context, id []int64) ([]*mod
 	var userList []*model.User
 	for _, v := range id {
 		userJson, err := r.redisClient.Get(ctx, "user:"+strconv.FormatInt(v, 10)).Bytes()
-		if err != nil {
+		if err != nil && err != redis.Nil {
 			klog.Error("redis get user by id failed,", err)
 			return nil, err
 		}
