@@ -9,6 +9,8 @@ import (
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/loadbalance"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
+	"github.com/kitex-contrib/obs-opentelemetry/provider"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	nacos "github.com/kitex-contrib/registry-nacos/resolver"
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
@@ -34,7 +36,11 @@ func InitSocial() socialityservice.Client {
 		CacheDir:            consts.NacosCacheDir,
 		LogLevel:            consts.NacosLogLevel,
 	}
-
+	provider.NewOpenTelemetryProvider(
+		provider.WithServiceName(config.GlobalServerConfig.Name),
+		provider.WithExportEndpoint(config.GlobalServerConfig.OtelInfo.EndPoint),
+		provider.WithInsecure(),
+	)
 	nacosCli, err := clients.NewNamingClient(
 		vo.NacosClientParam{
 			ClientConfig:  &cc,
@@ -50,7 +56,8 @@ func InitSocial() socialityservice.Client {
 		config.GlobalServerConfig.SocialitySrvInfo.Name,
 		client.WithResolver(r),                                     // service discovery
 		client.WithLoadBalancer(loadbalance.NewWeightedBalancer()), // load balance
-		client.WithMuxConnection(1),                                // multiplexing
+		client.WithMuxConnection(1),
+		client.WithSuite(tracing.NewClientSuite()), // multiplexing
 		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: config.GlobalServerConfig.SocialitySrvInfo.Name}),
 	)
 	if err != nil {
