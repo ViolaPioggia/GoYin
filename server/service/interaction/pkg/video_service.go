@@ -19,7 +19,7 @@ func (m *VideoManager) GetPublishedVideoIdList(ctx context.Context, userId int64
 	if err != nil {
 		return nil, err
 	}
-	if resp.BaseResp.StatusCode != 200 {
+	if resp.BaseResp.StatusCode != 0 {
 		return nil, err
 	}
 	return resp.VideoIdList, nil

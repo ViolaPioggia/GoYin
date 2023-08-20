@@ -24,7 +24,7 @@ func (i *InteractionManager) GetVideoInteractInfo(ctx context.Context, videoId, 
 	if err != nil {
 		return nil, err
 	}
-	if resp.BaseResp.StatusCode != 200 {
+	if resp.BaseResp.StatusCode != 0 {
 		return nil, err
 	}
 	return resp.InteractInfo, nil
@@ -36,7 +36,7 @@ func (i *InteractionManager) GetFavoriteVideoIdList(ctx context.Context, userId 
 	if err != nil {
 		return nil, err
 	}
-	if resp.BaseResp.StatusCode != 200 {
+	if resp.BaseResp.StatusCode != 0 {
 		return nil, err
 	}
 	return resp.VideoIdList, nil
@@ -51,7 +51,7 @@ func (i *InteractionManager) BatchGetVideoInteractInfo(ctx context.Context, vide
 	if err != nil {
 		return nil, err
 	}
-	if resp.BaseResp.StatusCode != 200 {
+	if resp.BaseResp.StatusCode != 0 {
 		return nil, err
 	}
 	return resp.InteractInfoList, nil

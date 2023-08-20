@@ -24,7 +24,7 @@ func (s *SocialManager) GetSocialInfo(ctx context.Context, viewerId, ownerId int
 	if err != nil {
 		return nil, err
 	}
-	if resp.BaseResp.StatusCode != 200 {
+	if resp.BaseResp.StatusCode != 0 {
 		return nil, errors.New("use social rpc getSocialInfo failed")
 	}
 	return resp.SocialInfo, nil
@@ -38,7 +38,7 @@ func (s *SocialManager) BatchGetSocialInfo(ctx context.Context, viewerId int64, 
 	if err != nil {
 		return nil, err
 	}
-	if resp.BaseResp.StatusCode != 200 {
+	if resp.BaseResp.StatusCode != 0 {
 		return nil, errors.New("use social rpc batchGetSocialInfo failed")
 	}
 	return resp.SocialInfoList, nil
@@ -53,7 +53,7 @@ func (s *SocialManager) GetRelationList(ctx context.Context, viewerId, ownerId i
 	if err != nil {
 		return nil, err
 	}
-	if resp.BaseResp.StatusCode != 200 {
+	if resp.BaseResp.StatusCode != 0 {
 		return nil, errors.New("use social rpc getRelationList failed")
 	}
 	return resp.UserIdList, nil

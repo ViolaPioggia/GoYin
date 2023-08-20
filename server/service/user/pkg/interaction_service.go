@@ -23,7 +23,7 @@ func (i *InteractionManager) GetInteractInfo(ctx context.Context, userId int64) 
 	if err != nil {
 		return nil, err
 	}
-	if resp.BaseResp.StatusCode != 200 {
+	if resp.BaseResp.StatusCode != 0 {
 		return nil, errors.New("user use interaction rpc getInteractInfo failed")
 	}
 	return resp.InteractInfo, nil
@@ -36,7 +36,7 @@ func (i *InteractionManager) BatchGetInteractInfo(ctx context.Context, userIdLis
 	if err != nil {
 		return nil, err
 	}
-	if resp.BaseResp.StatusCode != 200 {
+	if resp.BaseResp.StatusCode != 0 {
 		return nil, errors.New("user use interaction rpc BatchGetInteractInfo failed")
 	}
 	return resp.InteractInfoList, nil

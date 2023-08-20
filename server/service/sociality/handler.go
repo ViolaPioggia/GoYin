@@ -61,7 +61,7 @@ func (s *SocialityServiceImpl) Action(ctx context.Context, req *sociality.Douyin
 		return resp, err
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{}
-	resp.BaseResp.StatusCode = 200
+	resp.BaseResp.StatusCode = 0
 	resp.BaseResp.StatusMsg = "sociality action success"
 	return resp, nil
 }
@@ -84,7 +84,7 @@ func (s *SocialityServiceImpl) GetRelationIdList(ctx context.Context, req *socia
 		}
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "get sociality relationIdList success",
 	}
 	return resp, nil
@@ -108,7 +108,7 @@ func (s *SocialityServiceImpl) GetSocialInfo(ctx context.Context, req *sociality
 		}
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "sociality get socialInfo success",
 	}
 	resp.SocialInfo = &base.SocialInfo{
@@ -137,7 +137,7 @@ func (s *SocialityServiceImpl) BatchGetSocialInfo(ctx context.Context, req *soci
 		}
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "sociality batch get socialInfo success",
 	}
 	var Infos []*base.SocialInfo
@@ -150,7 +150,7 @@ func (s *SocialityServiceImpl) BatchGetSocialInfo(ctx context.Context, req *soci
 	}
 	resp.SocialInfoList = Infos
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "sociality batch get socialInfo success",
 	}
 	return resp, nil

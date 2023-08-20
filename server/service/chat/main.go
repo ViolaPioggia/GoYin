@@ -7,6 +7,7 @@ import (
 	"GoYin/server/service/chat/initialize"
 	"GoYin/server/service/chat/pkg"
 	"context"
+	"fmt"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
@@ -51,6 +52,6 @@ func main() {
 	err := svr.Run()
 
 	if err != nil {
-		klog.Error(err)
+		fmt.Println(err)
 	}
 }

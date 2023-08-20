@@ -80,7 +80,7 @@ func (s *VideoServiceImpl) Feed(ctx context.Context, req *video.DouyinFeedReques
 		return resp, err
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "get feed success",
 	}
 	for k, v := range videoIdList {
@@ -138,7 +138,7 @@ func (s *VideoServiceImpl) PublishVideo(ctx context.Context, req *video.DouyinPu
 		return resp, err
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "publish video success",
 	}
 	return resp, nil
@@ -178,7 +178,7 @@ func (s *VideoServiceImpl) GetPublishedVideoList(ctx context.Context, req *video
 		return resp, err
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "get publishedVideoList success",
 	}
 	for k, v := range videoIdList {
@@ -230,7 +230,7 @@ func (s *VideoServiceImpl) GetFavoriteVideoList(ctx context.Context, req *video.
 		return resp, err
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "get favoriteVideoList success",
 	}
 	for k, v := range videoIdList {
@@ -267,7 +267,7 @@ func (s *VideoServiceImpl) GetPublishedVideoIdList(ctx context.Context, req *vid
 	}
 	resp.VideoIdList = idList
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "video get publishedVideoIdList success",
 	}
 	return resp, nil

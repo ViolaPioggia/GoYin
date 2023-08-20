@@ -111,7 +111,7 @@ func (s *UserServiceImpl) Register(ctx context.Context, req *user.DouyinUserRegi
 		return resp, err
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "user register success",
 	}
 	return resp, nil
@@ -166,7 +166,7 @@ func (s *UserServiceImpl) Login(ctx context.Context, req *user.DouyinUserLoginRe
 	}
 
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "login success",
 	}
 	return resp, nil
@@ -205,7 +205,7 @@ func (s *UserServiceImpl) GetUserInfo(ctx context.Context, req *user.DouyinGetUs
 	}
 
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "get user by id success",
 	}
 	resp.User = &base.User{
@@ -271,7 +271,7 @@ func (s *UserServiceImpl) BatchGetUserInfo(ctx context.Context, req *user.Douyin
 		})
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "batch get userInfo success",
 	}
 	return resp, nil
@@ -333,7 +333,7 @@ func (s *UserServiceImpl) GetFollowList(ctx context.Context, req *user.DouyinGet
 		})
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "batch get followList success",
 	}
 	return resp, nil
@@ -395,7 +395,7 @@ func (s *UserServiceImpl) GetFollowerList(ctx context.Context, req *user.DouyinG
 		})
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "batch get followList success",
 	}
 	return resp, nil
@@ -458,7 +458,7 @@ func (s *UserServiceImpl) GetFriendList(ctx context.Context, req *user.DouyinGet
 		})
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "batch get followList success",
 	}
 	return resp, nil

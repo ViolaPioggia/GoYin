@@ -52,7 +52,7 @@ func (s *ChatServiceImpl) GetChatHistory(ctx context.Context, req *chat.DouyinMe
 		})
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "chat get history message failed",
 	}
 	return resp, nil
@@ -72,7 +72,7 @@ func (s *ChatServiceImpl) SentMessage(ctx context.Context, req *chat.DouyinMessa
 		return resp, err
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "chat publisher publish success",
 	}
 	return resp, nil
@@ -100,7 +100,7 @@ func (s *ChatServiceImpl) GetLatestMessage(ctx context.Context, req *chat.Douyin
 		MsgType: int64(msgType),
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "chat get latest message success",
 	}
 	return resp, nil
@@ -130,7 +130,7 @@ func (s *ChatServiceImpl) BatchGetLatestMessage(ctx context.Context, req *chat.D
 		})
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "chat batch get latest message success",
 	}
 	return resp, nil

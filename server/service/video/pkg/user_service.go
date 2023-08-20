@@ -25,7 +25,7 @@ func (m *UserManager) BatchGetUser(ctx context.Context, list []int64, viewerId i
 	if err != nil {
 		return nil, err
 	}
-	if res.BaseResp.StatusCode != 200 {
+	if res.BaseResp.StatusCode != 0 {
 		return nil, err
 	}
 	return res.UserList, nil
@@ -37,7 +37,7 @@ func (m *UserManager) GetUser(ctx context.Context, viewerId, ownerId int64) (*ba
 	if err != nil {
 		return nil, err
 	}
-	if int64(resp.BaseResp.StatusCode) != 200 {
+	if int64(resp.BaseResp.StatusCode) != 0 {
 		return nil, err
 	}
 	return resp.User, nil

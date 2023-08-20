@@ -99,7 +99,7 @@ func (s *InteractionServerImpl) Favorite(ctx context.Context, req *interaction.D
 		return resp, err
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "interaction FavoriteAction success",
 	}
 	return resp, nil
@@ -123,7 +123,7 @@ func (s *InteractionServerImpl) GetFavoriteVideoIdList(ctx context.Context, req 
 	}
 	resp.VideoIdList = res
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "interaction get favorite video id list success",
 	}
 	return
@@ -200,7 +200,7 @@ func (s *InteractionServerImpl) Comment(ctx context.Context, req *interaction.Do
 		return resp, nil
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "interaction CommentAction success",
 	}
 	resp.Comment = &base.Comment{
@@ -238,7 +238,7 @@ func (s *InteractionServerImpl) GetCommentList(ctx context.Context, req *interac
 		})
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "interaction get comment success",
 	}
 	return resp, nil
@@ -263,7 +263,7 @@ func (s *InteractionServerImpl) GetVideoInteractInfo(ctx context.Context, req *i
 		IsFavorite:    isFavorite,
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "interaction get video info success",
 	}
 	return resp, nil
@@ -289,7 +289,7 @@ func (s *InteractionServerImpl) BatchGetVideoInteractInfo(ctx context.Context, r
 		})
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "interaction get video info success",
 	}
 
@@ -340,7 +340,7 @@ func (s *InteractionServerImpl) GetUserInteractInfo(ctx context.Context, req *in
 		return resp, nil
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "interaction get userInteractInfo success",
 	}
 	return resp, nil
@@ -363,7 +363,7 @@ func (s *InteractionServerImpl) BatchGetUserInteractInfo(ctx context.Context, re
 		resp.InteractInfoList = append(resp.InteractInfoList, info)
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
-		StatusCode: 200,
+		StatusCode: 0,
 		StatusMsg:  "interaction batch get userInteractInfo success",
 	}
 	return resp, nil
