@@ -6,6 +6,7 @@ import (
 	video "GoYin/server/kitex_gen/video"
 	"GoYin/server/service/video/model"
 	"context"
+	"fmt"
 	"github.com/bwmarrin/snowflake"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"time"
@@ -150,6 +151,7 @@ func (s *VideoServiceImpl) GetPublishedVideoList(ctx context.Context, req *video
 
 	mv, err := s.RedisManager.GetPublishedVideoListByUserId(ctx, req.OwnerId)
 	if err != nil {
+		fmt.Println(1111111111111)
 		klog.Error("video redis get publishedVideoList failed,", err)
 		mv, err = s.MysqlManager.GetPublishedVideoListByUserId(ctx, req.OwnerId)
 		if err != nil {

@@ -37,16 +37,20 @@ func (r RedisManager) GetBasicVideoListByLatestTime(ctx context.Context, userId,
 }
 
 func (r RedisManager) GetPublishedVideoListByUserId(ctx context.Context, userId int64) ([]*model.Video, error) {
-	videoJson, err := r.redisClient.Get(ctx, "user_video:"+strconv.FormatInt(userId, 10)).Bytes()
-	if err != nil {
+	videoJson, err := r.redisClient.LRange(ctx, "user_video:"+strconv.FormatInt(userId, 10), 0, -1).Result()
+	if err != nil && err != redis.Nil {
 		klog.Error("redis get published videoList by userId failed,", err)
 		return nil, err
 	}
+	var video *model.Video
 	var res []*model.Video
-	err = sonic.Unmarshal(videoJson, &res)
-	if err != nil {
-		klog.Error("redis unmarshal video failed,", err)
-		return nil, err
+	for _, v := range videoJson {
+		err = sonic.UnmarshalString(v, &video)
+		if err != nil {
+			klog.Error("redis unmarshal video failed,", err)
+			return nil, err
+		}
+		res = append(res, video)
 	}
 	return res, nil
 }
@@ -75,20 +79,20 @@ func (r RedisManager) GetFavoriteVideoListByUserId(ctx context.Context, userId i
 }
 
 func (r RedisManager) GetPublishedVideoIdListByUserId(ctx context.Context, userId int64) ([]int64, error) {
-	videoJson, err := r.redisClient.Get(ctx, "user_video:"+strconv.FormatInt(userId, 10)).Bytes()
-	if err != nil {
+	videoJson, err := r.redisClient.LRange(ctx, "user_video:"+strconv.FormatInt(userId, 10), 0, -1).Result()
+	if err != nil && err != redis.Nil {
 		klog.Error("redis get published videoList by userId failed,", err)
 		return nil, err
 	}
-	var res []*model.Video
-	err = sonic.Unmarshal(videoJson, &res)
-	if err != nil {
-		klog.Error("redis unmarshal video failed,", err)
-		return nil, err
-	}
+	var video *model.Video
 	var idList []int64
-	for _, v := range res {
-		idList = append(idList, v.ID)
+	for _, v := range videoJson {
+		err = sonic.UnmarshalString(v, &video)
+		if err != nil {
+			klog.Error("redis unmarshal video failed,", err)
+			return nil, err
+		}
+		idList = append(idList, video.ID)
 	}
 	return idList, nil
 }
@@ -109,7 +113,7 @@ func (r RedisManager) PublishVideo(ctx context.Context, video *model.Video) erro
 		klog.Error("redis publish video failed,", err)
 		return err
 	}
-	err = r.redisClient.Set(ctx, "user_video:"+strconv.FormatInt(video.AuthorId, 10), videoJson, 0).Err()
+	err = r.redisClient.LPush(ctx, "user_video:"+strconv.FormatInt(video.AuthorId, 10), videoJson).Err()
 	if err != nil {
 		klog.Error("redis publish video failed,", err)
 		return err
