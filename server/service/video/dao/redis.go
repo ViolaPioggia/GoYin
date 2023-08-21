@@ -20,8 +20,8 @@ func (r RedisManager) GetBasicVideoListByLatestTime(ctx context.Context, userId,
 		return nil, err
 	}
 	var videoList []*model.Video
-	var video *model.Video
 	for _, v := range res {
+		var video *model.Video
 		err = sonic.UnmarshalString(v, &video)
 		if err != nil {
 			klog.Error("redis unmarshal video failed,", err)
@@ -42,9 +42,9 @@ func (r RedisManager) GetPublishedVideoListByUserId(ctx context.Context, userId 
 		klog.Error("redis get published videoList by userId failed,", err)
 		return nil, err
 	}
-	var video *model.Video
 	var res []*model.Video
 	for _, v := range videoJson {
+		var video *model.Video
 		err = sonic.UnmarshalString(v, &video)
 		if err != nil {
 			klog.Error("redis unmarshal video failed,", err)

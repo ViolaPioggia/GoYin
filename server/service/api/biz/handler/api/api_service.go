@@ -207,16 +207,23 @@ func PublishVideo(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	resp := new(api.DouyinPublishActionResponse)
+	_, flag = c.GetQuery("data")
+	if !flag {
+		hlog.Info("get data success")
+	} else {
+		hlog.Info("get data failed")
+	}
 	fileHeader, err := c.Request.FormFile("data")
+	if err != nil {
+		hlog.Error("api read video file failed,err", err)
+		resp.StatusCode = 500
+		resp.StatusMsg = "get publish video formFile failed"
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
 	s := strings.Split(fileHeader.Filename, ".")
 	s2 := s[len(s)-1:]
 	suffix := strings.Join(s2, "")
-	if err != nil {
-		resp.StatusCode = 500
-		resp.StatusMsg = "get publish video formFile failed"
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
-	}
 	sf, err := snowflake.NewNode(consts2.MinioSnowFlakeNode)
 	if err != nil {
 		hlog.Error("minio snowFlake generate failed,", err)
@@ -716,6 +723,7 @@ func ChatHistory(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
+	req.PreMsgTime = time.Now().UnixNano()
 	viewId, flag := c.Get("userId")
 	if !flag {
 		hlog.Error("api get viewerId failed,", err)

@@ -53,7 +53,7 @@ func (s *ChatServiceImpl) GetChatHistory(ctx context.Context, req *chat.DouyinMe
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
 		StatusCode: 0,
-		StatusMsg:  "chat get history message failed",
+		StatusMsg:  "chat get history message success",
 	}
 	return resp, nil
 }

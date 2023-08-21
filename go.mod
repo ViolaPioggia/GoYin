@@ -11,6 +11,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/hertz-contrib/gzip v0.0.1
 	github.com/hertz-contrib/obs-opentelemetry/logging/logrus v0.1.1
 	github.com/hertz-contrib/obs-opentelemetry/tracing v0.2.2
 	github.com/hertz-contrib/pprof v0.1.0

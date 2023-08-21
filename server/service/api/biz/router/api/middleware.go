@@ -6,11 +6,14 @@ import (
 	"GoYin/server/common/middleware"
 	"GoYin/server/service/api/config"
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/hertz-contrib/gzip"
 )
 
 func rootMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{
+		// use gzip mw
+		gzip.Gzip(gzip.DefaultCompression, gzip.WithExcludedExtensions([]string{".jpg", ".mp4", ".png"})),
+	}
 }
 
 func _douyinMw() []app.HandlerFunc {

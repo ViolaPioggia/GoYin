@@ -68,7 +68,7 @@ func (m MysqlManager) GetHistoryMessage(ctx context.Context, userId, toUserId, t
 		if err := m.db.
 			Order("create_time DESC").
 			Where("from_user_id = ? AND to_user_id = ? AND create_time < ?", userId, toUserId, time).
-			Or("to_user_id = ? AND from_user_id = ? AND create_time < ?", toUserId, userId, time).
+			Or("to_user_id = ? AND from_user_id = ? AND create_time < ?", userId, toUserId, time).
 			Find(&messages).Error; err != nil {
 			tx.Rollback()
 			return nil, err
