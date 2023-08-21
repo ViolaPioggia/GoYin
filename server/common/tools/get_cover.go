@@ -1,25 +1,27 @@
 package tools
 
 import (
-	"os/exec"
-	"path/filepath"
-	"strings"
+	"bytes"
+	"github.com/disintegration/imaging"
+	ffmpeg "github.com/u2takey/ffmpeg-go"
+	"image"
 )
 
-func GetVideoCover(videoPath string) (string, error) {
-	// 获取视频文件名（不包含扩展名）
-	videoFileName := strings.TrimSuffix(filepath.Base(videoPath), filepath.Ext(videoPath))
-
-	// 生成封面图片文件名
-	coverFileName := videoFileName + ".jpg"
-
-	// 构造 FFmpeg 命令
-	cmd := exec.Command("/opt/homebrew/bin/ffmpeg", "-i", videoPath, "-ss", "00:00:01", "-vframes", "1", coverFileName)
-
-	// 执行 FFmpeg 命令
-	if err := cmd.Run(); err != nil {
-		return "", err
+func GetVideoCover(videoPath string, coverPath string) error {
+	buf := bytes.NewBuffer(nil)
+	err := ffmpeg.Input(videoPath).
+		Filter("select", ffmpeg.Args{"gte(n,1)"}).
+		Output("pipe:", ffmpeg.KwArgs{"vframes": 1, "format": "image2", "vcodec": "mjpeg"}).
+		WithOutput(buf).Run()
+	if err != nil {
+		return err
 	}
-
-	return coverFileName, nil
+	var img image.Image
+	if img, err = imaging.Decode(buf); err != nil {
+		return err
+	}
+	if err = imaging.Save(img, coverPath); err != nil {
+		return err
+	}
+	return nil
 }

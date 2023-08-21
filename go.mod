@@ -8,6 +8,7 @@ require (
 	github.com/bytedance/sonic v1.8.8
 	github.com/cloudwego/hertz v0.6.7
 	github.com/cloudwego/kitex v0.6.2
+	github.com/disintegration/imaging v1.6.2
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/hertz-contrib/obs-opentelemetry/logging/logrus v0.1.1
@@ -21,6 +22,7 @@ require (
 	github.com/nacos-group/nacos-sdk-go v1.1.4
 	github.com/nsqio/go-nsq v1.1.0
 	github.com/spf13/viper v1.16.0
+	github.com/u2takey/ffmpeg-go v0.5.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/gorm v1.25.2
@@ -30,6 +32,7 @@ require (
 require (
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.18 // indirect
 	github.com/andeya/goutil v1.0.0 // indirect
+	github.com/aws/aws-sdk-go v1.38.20 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/bytedance/go-tagexpr/v2 v2.9.6 // indirect
 	github.com/bytedance/gopkg v0.0.0-20230531144706-a12972768317 // indirect
@@ -60,7 +63,7 @@ require (
 	github.com/jhump/protoreflect v1.8.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
@@ -86,6 +89,7 @@ require (
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
+	github.com/u2takey/go-utils v0.3.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.42.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.17.0 // indirect
 	go.opentelemetry.io/contrib/propagators/ot v1.17.0 // indirect
@@ -105,6 +109,7 @@ require (
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/arch v0.2.0 // indirect
 	golang.org/x/crypto v0.11.0 // indirect
+	golang.org/x/image v0.0.0-20220302094943-723b81ca9867 // indirect
 	golang.org/x/net v0.12.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.10.0 // indirect

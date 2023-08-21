@@ -225,6 +225,7 @@ func PublishVideo(ctx context.Context, c *app.RequestContext) {
 	id := sf.Generate().String()
 	uploadPathBase := time.Now().Format("2006/01/02/") + id
 	VTmpPath := "./tmp/video/" + id + "." + suffix
+	CTmpPath := "./tmp/cover/" + id + ".png"
 	VUpPath := uploadPathBase + "." + suffix
 	CUpPath := uploadPathBase + ".png"
 	videoFile, err := os.Create("./tmp/video/" + id + "." + suffix)
@@ -249,19 +250,19 @@ func PublishVideo(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusInternalServerError, err.Error())
 		return
 	}
-	err = pkg.MinioUpgrade(suffix, VTmpPath, VUpPath)
+	err = pkg.MinioVideoUpgrade(suffix, VTmpPath, VUpPath)
 	if err != nil {
 		hlog.Error("api_srv upgrade video failed,", err)
 		c.String(consts.StatusInternalServerError, err.Error())
 		return
 	}
-	CTmpPath, err := tools.GetVideoCover(VTmpPath)
+	err = tools.GetVideoCover(VTmpPath, CTmpPath)
 	if err != nil {
 		hlog.Error("api_srv upgrade minio object failed,", err)
 		c.String(consts.StatusInternalServerError, err.Error())
 		return
 	}
-	err = pkg.MinioUpgrade(suffix, CTmpPath, CUpPath)
+	err = pkg.MinioCoverUpgrade(CTmpPath, CUpPath)
 	if err != nil {
 		hlog.Error("api_srv upgrade cover failed,", err)
 		c.String(consts.StatusInternalServerError, err.Error())
@@ -623,7 +624,7 @@ func FollowerList(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, errors.New("api context get viewerId failed").Error())
 		return
 	}
-	res, err := config.GlobalUserClient.GetFollowList(ctx, &user.DouyinGetRelationFollowListRequest{
+	res, err := config.GlobalUserClient.GetFollowerList(ctx, &user.DouyinGetRelationFollowerListRequest{
 		ViewerId: viewId.(int64),
 		OwnerId:  req.UserID,
 	})
@@ -632,7 +633,7 @@ func FollowerList(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusInternalServerError, err.Error())
 		return
 	}
-	resp := new(api.DouyinRelationFollowListResponse)
+	resp := new(api.DouyinRelationFollowerListResponse)
 	resp.StatusMsg = res.BaseResp.StatusMsg
 	resp.StatusCode = res.BaseResp.StatusCode
 	for _, v := range res.UserList {
