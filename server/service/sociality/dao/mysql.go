@@ -193,7 +193,7 @@ func (m MysqlManager) HandleSocialInfo(ctx context.Context, userId int64, toUser
 		return ctx.Err()
 	default:
 		var temp model.ConcernList
-		err := m.db.Where("user_id = ? AND follower_id = ? ", userId, toUserId).First(&temp).Error
+		err := m.db.Where("user_id = ? AND follower_id = ? ", toUserId, userId).First(&temp).Error
 		switch actionType {
 		case consts.Follow:
 			if err != nil && err != gorm.ErrRecordNotFound { //出错返回err
@@ -227,7 +227,7 @@ func (m MysqlManager) HandleSocialInfo(ctx context.Context, userId int64, toUser
 				return nil
 			}
 			//找到了数据则进行删除
-			err = m.db.Where("user_id = ? AND follower_id = ?", userId, toUserId).Delete(&model.ConcernList{}).Error
+			err = m.db.Where("user_id = ? AND follower_id = ?", toUserId, userId).Delete(&model.ConcernList{}).Error
 			if err != nil {
 				tx.Rollback()
 				return err

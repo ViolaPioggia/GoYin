@@ -25,6 +25,7 @@ func main() {
 	rdb := initialize.InitRedis()
 	socialClient := initialize.InitSocial()
 	interactionClient := initialize.InitInteraction()
+	chatClient := initialize.InitChat()
 	p := provider.NewOpenTelemetryProvider(
 		provider.WithServiceName(config.GlobalServerConfig.Name),
 		provider.WithExportEndpoint(config.GlobalServerConfig.OtelInfo.EndPoint),
@@ -35,6 +36,7 @@ func main() {
 		Jwt:                middleware.NewJWT(config.GlobalServerConfig.JWTInfo.SigningKey),
 		InteractionManager: pkg.NewInteractionManager(interactionClient),
 		SocialManager:      pkg.NewSocialManager(socialClient),
+		ChatManager:        pkg.NewChatManager(chatClient),
 		RedisManager:       dao.NewRedisManager(rdb),
 		MysqlManager:       dao.NewUser(db),
 	}

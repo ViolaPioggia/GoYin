@@ -66,9 +66,9 @@ func (m MysqlManager) GetHistoryMessage(ctx context.Context, userId, toUserId, t
 	default:
 		var messages []*model.Message
 		if err := m.db.
-			Order("create_time DESC").
-			Where("from_user_id = ? AND to_user_id = ? AND create_time < ?", userId, toUserId, time).
-			Or("to_user_id = ? AND from_user_id = ? AND create_time < ?", userId, toUserId, time).
+			Order("create_time ASC").
+			Where("from_user_id = ? AND to_user_id = ? AND create_time > ?", userId, toUserId, time).
+			Or("to_user_id = ? AND from_user_id = ? AND create_time > ?", userId, toUserId, time).
 			Find(&messages).Error; err != nil {
 			tx.Rollback()
 			return nil, err
@@ -100,7 +100,8 @@ func (m MysqlManager) GetLatestMessage(ctx context.Context, userId, toUserId int
 		if err := m.db.
 			Order("create_time DESC").
 			Where("from_user_id = ? AND to_user_id = ?", userId, toUserId).
-			First(&message).Error; err != nil {
+			Or("to_user_id = ? AND from_user_id = ?", userId, toUserId).
+			First(&message).Error; err != nil && err != gorm.ErrRecordNotFound {
 			tx.Rollback()
 			return nil, err
 		}
@@ -131,10 +132,11 @@ func (m MysqlManager) BatchGetLatestMessage(ctx context.Context, userId int64, t
 		for _, v := range toUserIdList {
 			var msg model.Message
 			if err := m.db.
-				Where("from_user_id = ? AND to_user = ?", userId, v).
+				Where("from_user_id = ? AND to_user_id = ?", userId, v).
+				Or("to_user_id = ? AND from_user_id = ?", userId, v).
 				Order("create_time DESC").
 				First(&msg).
-				Error; err != nil {
+				Error; err != nil && err != gorm.ErrRecordNotFound {
 				tx.Rollback()
 				return nil, err
 			}

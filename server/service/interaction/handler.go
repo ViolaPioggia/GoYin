@@ -18,9 +18,14 @@ type InteractionServerImpl struct {
 	FavoriteManager
 	CommentManager
 	VideoManager
+	UserManager
 }
 type VideoManager interface {
 	GetPublishedVideoIdList(ctx context.Context, userId int64) ([]int64, error)
+}
+type UserManager interface {
+	GetUser(ctx context.Context, viewerId, ownerId int64) (*base.User, error)
+	BatchGetUser(ctx context.Context, list []int64, viewerId int64) ([]*base.User, error)
 }
 type CommentManager interface {
 	Comment(ctx context.Context, comment *model.Comment) error
@@ -35,8 +40,6 @@ type FavoriteManager interface {
 	GetFavoriteVideoIdList(ctx context.Context, userId int64) ([]int64, error)
 	GetFavoriteCount(ctx context.Context, videoId int64) (int64, error)
 	JudgeIsFavoriteCount(ctx context.Context, videoId, userId int64) (bool, error)
-	GetFavoriteCountByVideoId(videoId int64) (int64, error)
-	GetFavoriteVideoCountByUserId(userId int64) (int64, error)
 }
 type RedisManager interface {
 	FavoriteAction(ctx context.Context, userId, videoId int64) error
@@ -248,11 +251,22 @@ func (s *InteractionServerImpl) GetCommentList(ctx context.Context, req *interac
 		}
 	}
 	for _, v := range commentList {
+		timestamp := v.CreateDate
+		seconds := timestamp / int64(time.Second)
+		nanoseconds := timestamp % int64(time.Second)
+		timeObj := time.Unix(seconds, nanoseconds)
+		user, err := s.UserManager.GetUser(ctx, 0, v.UserId)
+		if err != nil {
+			klog.Error("interaction userManager get user failed,", err)
+			return nil, err
+		}
+		// 将时间对象格式化为字符串
+		timeStr := timeObj.Format("2006-01-02 15:04:05")
 		resp.CommentList = append(resp.CommentList, &base.Comment{
 			Id:         v.ID,
-			User:       &base.User{Id: v.UserId},
+			User:       user,
 			Content:    v.CommentText,
-			CreateDate: strconv.FormatInt(v.CreateDate, 10),
+			CreateDate: timeStr,
 		})
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{
@@ -396,16 +410,27 @@ func (s *InteractionServerImpl) getUserInteractInfo(ctx context.Context, userId 
 	}
 	info.WorkCount = int64(len(videoIdList))
 	for _, vid := range videoIdList {
-		count, err := s.FavoriteManager.GetFavoriteCountByVideoId(vid)
+		count, err := s.RedisManager.GetFavoriteCount(ctx, vid)
 		if err != nil {
-			return nil, err
+			klog.Error("interaction redis get favorite count failed,", err)
+			count, err = s.FavoriteManager.GetFavoriteCount(ctx, vid)
+			if err != nil {
+				klog.Error("interaction mysql get favorite count failed,", err)
+				return nil, err
+			}
 		}
 		info.TotalFavorited += count
 	}
 
-	info.FavoriteCount, err = s.FavoriteManager.GetFavoriteVideoCountByUserId(userId)
+	num, err := s.RedisManager.GetFavoriteVideoIdList(ctx, userId)
 	if err != nil {
-		return nil, err
+		klog.Error("interaction redis get favoriteVideoIdList failed,", err)
+		num, err = s.FavoriteManager.GetFavoriteVideoIdList(ctx, userId)
+		if err != nil {
+			klog.Error("interaction mysql get favoriteVideoIdList failed,", err)
+			return nil, err
+		}
 	}
+	info.FavoriteCount = int64(len(num))
 	return info, nil
 }

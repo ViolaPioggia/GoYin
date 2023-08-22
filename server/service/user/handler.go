@@ -36,6 +36,9 @@ type InteractionManager interface {
 	GetInteractInfo(ctx context.Context, userId int64) (*base.UserInteractInfo, error)
 	BatchGetInteractInfo(ctx context.Context, userIdList []int64) ([]*base.UserInteractInfo, error)
 }
+type ChatManager interface {
+	BatchGetLatestMessage(ctx context.Context, userId int64, toUserIdList []int64) ([]*base.LatestMsg, error)
+}
 
 // UserServiceImpl implements the last service interface defined in the IDL.
 type UserServiceImpl struct {
@@ -44,6 +47,7 @@ type UserServiceImpl struct {
 	RedisManager
 	SocialManager
 	InteractionManager
+	ChatManager
 }
 
 // Register implements the UserServiceImpl interface.
@@ -442,6 +446,15 @@ func (s *UserServiceImpl) GetFriendList(ctx context.Context, req *user.DouyinGet
 		}
 		return resp, err
 	}
+	chatList, err := s.ChatManager.BatchGetLatestMessage(ctx, req.ViewerId, userIdlist)
+	if err != nil {
+		klog.Errorf("user chatManager get chatList failed,", err)
+		resp.BaseResp = &base.DouyinBaseResponse{
+			StatusCode: 500,
+			StatusMsg:  "user chatManager get chatList failed",
+		}
+		return resp, err
+	}
 	for i := 0; i <= len(userList)-1; i++ {
 		resp.UserList = append(resp.UserList, &base.FriendUser{
 			Id:              userList[i].ID,
@@ -455,6 +468,8 @@ func (s *UserServiceImpl) GetFriendList(ctx context.Context, req *user.DouyinGet
 			TotalFavorited:  interactionList[i].TotalFavorited,
 			WorkCount:       interactionList[i].WorkCount,
 			FavoriteCount:   interactionList[i].FavoriteCount,
+			MsgType:         chatList[i].MsgType,
+			Message:         chatList[i].Message,
 		})
 	}
 	resp.BaseResp = &base.DouyinBaseResponse{

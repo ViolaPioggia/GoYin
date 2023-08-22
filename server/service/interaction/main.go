@@ -23,6 +23,7 @@ func main() {
 	db := initialize.InitDB()
 	rdb := initialize.InitRedis()
 	videoClient := initialize.InitVideo()
+	userClient := initialize.InitUser()
 	p := provider.NewOpenTelemetryProvider(
 		provider.WithServiceName(config.GlobalServerConfig.Name),
 		provider.WithExportEndpoint(config.GlobalServerConfig.OtelInfo.EndPoint),
@@ -31,6 +32,7 @@ func main() {
 	defer p.Shutdown(context.Background())
 	impl := &InteractionServerImpl{
 		VideoManager:    pkg.NewVideoManager(videoClient),
+		UserManager:     pkg.NewUserManager(userClient),
 		RedisManager:    dao.NewRedisManager(rdb),
 		CommentManager:  dao.NewMysqlManager(db),
 		FavoriteManager: dao.NewMysqlManager(db),

@@ -45,8 +45,13 @@ type ServerConfig struct {
 	NsqInfo      NsqConfig      `mapstructure:"nsq" json:"nsq"`
 	OtelInfo     OtelConfig     `mapstructure:"otel" json:"otel"`
 	VideoSrvInfo VideoSrvConfig `mapstructure:"video_srv" json:"video_srv"`
+	UserSrvInfo  UserSrvConfig  `mapstructure:"user_srv" json:"user_srv"`
 }
 
 type VideoSrvConfig struct {
+	Name string `mapstructure:"name" json:"name"`
+}
+
+type UserSrvConfig struct {
 	Name string `mapstructure:"name" json:"name"`
 }

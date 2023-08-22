@@ -3,6 +3,7 @@
 package api
 
 import (
+	"GoYin/server/common/middleware"
 	"GoYin/server/common/tools"
 	"GoYin/server/kitex_gen/chat"
 	"GoYin/server/kitex_gen/interaction"
@@ -143,16 +144,23 @@ func Feed(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	//viewerId, flag := c.Get("userId")
-	//if !flag {
-	//	hlog.Error("api get viewerId failed,", err)
-	//	c.String(consts.StatusBadRequest, errors.New("api context get viewerId failed").Error())
-	//	return
-	//}
 	resp := new(api.DouyinFeedResponse)
+	var viewerId int64
+	token := req.Token
+	if token != "" {
+		j := middleware.NewJWT(config.GlobalServerConfig.JWTInfo.SigningKey)
+		claims, err := j.ParseToken(req.Token)
+		if err != nil {
+			resp.StatusCode = 400
+			resp.StatusMsg = "bad token"
+			c.String(consts.StatusBadRequest, err.Error())
+			return
+		}
+		viewerId = claims.ID
+	}
 	res, err := config.GlobalVideoClient.Feed(ctx, &video.DouyinFeedRequest{
 		LatestTime: req.LatestTime,
-		ViewerId:   0,
+		ViewerId:   viewerId,
 	})
 	if err != nil {
 		hlog.Error("api call video_srv failed,", err)
@@ -723,7 +731,6 @@ func ChatHistory(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	req.PreMsgTime = time.Now().UnixNano()
 	viewId, flag := c.Get("userId")
 	if !flag {
 		hlog.Error("api get viewerId failed,", err)
