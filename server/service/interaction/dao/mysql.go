@@ -129,9 +129,9 @@ func (m MysqlManager) UnFavoriteAction(ctx context.Context, userId, videoId int6
 			return err
 		}
 		favorite.ActionType = consts.UnLike
-		err = m.favoriteDb.Model(&model.Favorite{}).Updates(favorite).Error
+		err = m.favoriteDb.Model(&model.Favorite{}).Where("user_id = ? AND video_id = ?", userId, videoId).UpdateColumn("action_type", favorite.ActionType).Error
 		if err != nil {
-			klog.Errorf("mysql insert failed,", err)
+			klog.Errorf("mysql update failed: %v", err)
 			tx.Rollback()
 			return err
 		}

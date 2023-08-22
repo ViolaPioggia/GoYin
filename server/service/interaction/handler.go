@@ -54,7 +54,25 @@ type RedisManager interface {
 func (s *InteractionServerImpl) Favorite(ctx context.Context, req *interaction.DouyinFavoriteActionRequest) (resp *interaction.DouyinFavoriteActionResponse, err error) {
 	resp = new(interaction.DouyinFavoriteActionResponse)
 	if req.ActionType == consts.Like {
-		if err := s.FavoriteManager.FavoriteAction(ctx, req.UserId, req.VideoId); err != nil {
+		idList, err := s.RedisManager.GetFavoriteVideoIdList(ctx, req.UserId)
+		if err != nil {
+			klog.Errorf("interaction get favoriteVideoIdList failed,err", err)
+			resp.BaseResp = &base.DouyinBaseResponse{
+				StatusCode: 500,
+				StatusMsg:  "interaction get favoriteVideoIdList failed",
+			}
+			return resp, err
+		}
+		for _, v := range idList {
+			if v == req.VideoId {
+				resp.BaseResp = &base.DouyinBaseResponse{
+					StatusCode: 0,
+					StatusMsg:  "you have been favorited this video",
+				}
+				return resp, nil
+			}
+		}
+		if err = s.FavoriteManager.FavoriteAction(ctx, req.UserId, req.VideoId); err != nil {
 			//回滚
 			klog.Errorf("interaction mysql favorite failed,err", err)
 			resp.BaseResp = &base.DouyinBaseResponse{

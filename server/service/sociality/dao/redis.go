@@ -48,8 +48,8 @@ func (r RedisManager) GetUserIdList(ctx context.Context, userId int64, option in
 			return nil, err
 		}
 		var followList []int64
-		var follow int64
 		for _, v := range res {
+			var follow int64
 			follow, _ = strconv.ParseInt(v, 10, 64)
 			followList = append(followList, follow)
 		}
@@ -61,8 +61,8 @@ func (r RedisManager) GetUserIdList(ctx context.Context, userId int64, option in
 			return nil, err
 		}
 		var followerList []int64
-		var follower int64
 		for _, v := range res {
+			var follower int64
 			follower, _ = strconv.ParseInt(v, 10, 64)
 			followerList = append(followerList, follower)
 		}
@@ -74,8 +74,8 @@ func (r RedisManager) GetUserIdList(ctx context.Context, userId int64, option in
 			return nil, err
 		}
 		var friendList []int64
-		var friend int64
 		for _, v := range res {
+			var friend int64
 			friend, _ = strconv.ParseInt(v, 10, 64)
 			friendList = append(friendList, friend)
 		}
