@@ -20,6 +20,7 @@ func main() {
 	// initialize
 	initialize.InitLogger()
 	r, info := initialize.InitNacos()
+	initialize.InitIP()
 	initialize.InitSentinel()
 	initialize.InitMinio()
 	tracer, cfg := hertztracing.NewServerTracer()

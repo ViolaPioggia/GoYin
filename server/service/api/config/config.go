@@ -1,5 +1,7 @@
 package config
 
+import "github.com/ip2location/ip2location-go/v9"
+
 type NacosConfig struct {
 	Host      string `mapstructure:"host"`
 	Port      uint64 `mapstructure:"port"`
@@ -26,17 +28,18 @@ type OtelConfig struct {
 }
 
 type ServerConfig struct {
-	Name               string       `mapstructure:"name" json:"name"`
-	Host               string       `mapstructure:"host" json:"host"`
-	Port               int          `mapstructure:"port" json:"port"`
-	MinioInfo          MinioConfig  `mapstructure:"minio" json:"minio"`
-	JWTInfo            JWTConfig    `mapstructure:"jwt" json:"jwt"`
-	OtelInfo           OtelConfig   `mapstructure:"otel" json:"otel"`
-	ChatSrvInfo        RPCSrvConfig `mapstructure:"chat_srv" json:"chat_srv"`
-	UserSrvInfo        RPCSrvConfig `mapstructure:"user_srv" json:"user_srv"`
-	InteractionSrvInfo RPCSrvConfig `mapstructure:"interaction_srv" json:"interaction_srv"`
-	SocialitySrvInfo   RPCSrvConfig `mapstructure:"sociality_srv" json:"sociality_srv"`
-	VideoSrvInfo       RPCSrvConfig `mapstructure:"video_srv" json:"video_srv"`
+	Name               string          `mapstructure:"name" json:"name"`
+	Host               string          `mapstructure:"host" json:"host"`
+	Port               int             `mapstructure:"port" json:"port"`
+	MinioInfo          MinioConfig     `mapstructure:"minio" json:"minio"`
+	JWTInfo            JWTConfig       `mapstructure:"jwt" json:"jwt"`
+	OtelInfo           OtelConfig      `mapstructure:"otel" json:"otel"`
+	ChatSrvInfo        RPCSrvConfig    `mapstructure:"chat_srv" json:"chat_srv"`
+	UserSrvInfo        RPCSrvConfig    `mapstructure:"user_srv" json:"user_srv"`
+	InteractionSrvInfo RPCSrvConfig    `mapstructure:"interaction_srv" json:"interaction_srv"`
+	SocialitySrvInfo   RPCSrvConfig    `mapstructure:"sociality_srv" json:"sociality_srv"`
+	VideoSrvInfo       RPCSrvConfig    `mapstructure:"video_srv" json:"video_srv"`
+	IpInfo             *ip2location.DB `mapstructure:"ip" json:"ip"`
 }
 
 type RPCSrvConfig struct {
