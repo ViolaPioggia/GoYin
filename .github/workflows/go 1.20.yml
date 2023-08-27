@@ -1,0 +1,58 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go 1.20
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+
+    - name: Build Api
+      run: go build -v ./server/service/api/
+
+    - name: Test Api
+      run: go test -v ./server/service/api/
+      
+    - name: Build Chat
+      run: go build -v ./server/service/chat/
+
+    - name: Test Chat
+      run: go test -v ./server/service/chat/
+
+    - name: Build Interaction
+      run: go build -v ./server/service/interaction/
+
+    - name: Test Interaction
+      run: go test -v ./server/service/interaction/
+
+    - name: Build Sociality
+      run: go build -v ./server/service/sociality/
+
+    - name: Test Sociality
+      run: go test -v ./server/service/sociality/
+
+    - name: Build User
+      run: go build -v ./server/service/user/
+
+    - name: Test User
+      run: go test -v ./server/service/user/
+
+    - name: Build Video
+      run: go build -v ./server/service/video/
+
+    - name: Test Video
+      run: go test -v ./server/service/video/
