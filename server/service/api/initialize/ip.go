@@ -7,7 +7,7 @@ import (
 )
 
 func InitIP() {
-	ipDb, err := ip2location.OpenDB("./IP2LOCATION-LITE-DB11.BIN")
+	ipDb, err := ip2location.OpenDB("./deployment/ip_info/IP2LOCATION-LITE-DB11.BIN")
 
 	if err != nil {
 		klog.Fatal("initialize ipDb failed,", err)
