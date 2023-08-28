@@ -34,7 +34,7 @@ jobs:
       run: go test -v ./server/service/chat/
       
     - name: Test Chat_Bench
-      run: go build -v -bench=./server/service/chat/ -benchmem
+      run: go test -v -bench=./server/service/chat/ -benchmem
 
     - name: Build Interaction
       run: go build -v ./server/service/interaction/ 
@@ -43,7 +43,7 @@ jobs:
       run: go test -v ./server/service/interaction/
 
     - name: Test Interaction_Bench
-      run: go build -v -bench=./server/service/interaction/ -benchmem
+      run: go test -v -bench=./server/service/interaction/ -benchmem
 
     - name: Build Sociality
       run: go build -v ./server/service/sociality/
@@ -52,7 +52,7 @@ jobs:
       run: go test -v ./server/service/sociality/
 
     - name: Test Sociality_Bench
-      run: go build -v -bench=./server/service/sociality/ -benchmem
+      run: go test -v -bench=./server/service/sociality/ -benchmem
 
     - name: Build User
       run: go build -v ./server/service/user/
@@ -61,7 +61,7 @@ jobs:
       run: go test -v ./server/service/user/
 
     - name: Test User_Bench
-      run: go build -v -bench=./server/service/user/ -benchmem
+      run: go test -v -bench=./server/service/user/ -benchmem
 
     - name: Build Video
       run: go build -v ./server/service/video/
@@ -70,4 +70,4 @@ jobs:
       run: go test -v ./server/service/video/
 
     - name: Test Video_Bench
-      run: go build -v -bench=./server/service/video/ -benchmem
+      run: go test -v -bench=./server/service/video/ -benchmem
