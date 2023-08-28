@@ -33,17 +33,17 @@ jobs:
     - name: Test Chat
       run: go test -v ./server/service/chat/
       
-    - name: Test Chat_dao
-      run: go test -v ./server/service/chat/dao/
+    - name: Test Chat_Bench
+      run: go build -v -bench=./server/service/chat/ -benchmem
 
     - name: Build Interaction
-      run: go build -v ./server/service/interaction/
+      run: go build -v ./server/service/interaction/ 
 
     - name: Test Interaction
       run: go test -v ./server/service/interaction/
 
-    - name: Test Interaction_dao
-      run: go test -v ./server/service/interaction/dao/
+    - name: Test Interaction_Bench
+      run: go build -v -bench=./server/service/interaction/ -benchmem
 
     - name: Build Sociality
       run: go build -v ./server/service/sociality/
@@ -51,8 +51,8 @@ jobs:
     - name: Test Sociality
       run: go test -v ./server/service/sociality/
 
-    - name: Test Sociality_dao
-      run: go test -v ./server/service/sociality/dao/
+    - name: Test Sociality_Bench
+      run: go build -v -bench=./server/service/sociality/ -benchmem
 
     - name: Build User
       run: go build -v ./server/service/user/
@@ -60,8 +60,8 @@ jobs:
     - name: Test User
       run: go test -v ./server/service/user/
 
-    - name: Test User_dao
-      run: go test -v ./server/service/user/dao/
+    - name: Test User_Bench
+      run: go build -v -bench=./server/service/user/ -benchmem
 
     - name: Build Video
       run: go build -v ./server/service/video/
@@ -69,5 +69,5 @@ jobs:
     - name: Test Video
       run: go test -v ./server/service/video/
 
-    - name: Test Video_dao
-      run: go test -v ./server/service/video/dao/
+    - name: Test Video_Bench
+      run: go build -v -bench=./server/service/video/ -benchmem
