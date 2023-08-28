@@ -34,7 +34,7 @@ jobs:
       run: go test -v ./server/service/chat/
       
     - name: Test Chat_Bench
-      run: go test -v -bench=./server/service/chat/dao/ -benchmem
+      run: cd ./server/service/chat/dao/ && go test -v -bench=. -benchmem
 
     - name: Build Interaction
       run: go build -v ./server/service/interaction/ 
