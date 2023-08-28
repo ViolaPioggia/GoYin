@@ -7,6 +7,8 @@ import (
 	"GoYin/server/service/sociality/initialize"
 	"GoYin/server/service/sociality/pkg"
 	"context"
+	"errors"
+	kitexSentinel "github.com/alibaba/sentinel-golang/pkg/adapters/kitex"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
@@ -22,6 +24,7 @@ import (
 func main() {
 	initialize.InitLogger()
 	r, info := initialize.InitNacos()
+	initialize.Sentinel()
 	db := initialize.InitDB()
 	rdb := initialize.InitRedis()
 	p := provider.NewOpenTelemetryProvider(
@@ -49,7 +52,15 @@ func main() {
 		server.WithRegistryInfo(info),
 		server.WithLimit(&limit.Option{MaxConnections: 2000, MaxQPS: 500}),
 		server.WithSuite(tracing.NewServerSuite()),
-		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: config.GlobalServerConfig.Name}))
+		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: config.GlobalServerConfig.Name}),
+		server.WithMiddleware(kitexSentinel.SentinelServerMiddleware(
+			kitexSentinel.WithResourceExtract(func(ctx context.Context, req, resp interface{}) string {
+				return config.GlobalServerConfig.CbRule.Resource
+			}),
+			kitexSentinel.WithBlockFallback(func(ctx context.Context, req, resp interface{}, blockErr error) error {
+				return errors.New("service block")
+			}),
+		)))
 
 	err := svr.Run()
 

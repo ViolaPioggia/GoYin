@@ -9,8 +9,14 @@ const (
 
 	MysqlAlreadyExists = "useralreadyexists"
 
-	KlogFilePath = "./tmp/klog/logs"
-	HlogFilePath = "./tmp/hlog/logs"
+	KlogFilePath                = "./tmp/klog/logs"
+	HlogFilePath                = "./tmp/hlog/logs"
+	UserSentinelFilePath        = "./tmp/circuit/user"
+	ChatSentinelFilePath        = "./tmp/circuit/chat"
+	InteractionSentinelFilePath = "./tmp/circuit/interaction"
+	SocialSentinelFilePath      = "./tmp/circuit/social"
+	VideoSentinelFilePath       = "./tmp/circuit/video"
+	ApiSentinelFilePath         = "./tmp/flow/api"
 
 	NacosLogDir   = "tmp/nacos/log"
 	NacosCacheDir = "tmp/nacos/cache"

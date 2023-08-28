@@ -6,6 +6,8 @@ import (
 	"GoYin/server/service/video/dao"
 	"GoYin/server/service/video/pkg"
 	"context"
+	"errors"
+	kitexSentinel "github.com/alibaba/sentinel-golang/pkg/adapters/kitex"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
@@ -13,15 +15,16 @@ import (
 	"github.com/cloudwego/kitex/server"
 	"github.com/kitex-contrib/obs-opentelemetry/provider"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
+	"log"
 	"net"
 
 	"GoYin/server/service/video/initialize"
-	"log"
 )
 
 func main() {
 	initialize.InitLogger()
 	r, info := initialize.InitNacos()
+	initialize.Sentinel()
 	db := initialize.InitDB()
 	rdb := initialize.InitRedis()
 	publisher := initialize.InitProducer()
@@ -53,7 +56,15 @@ func main() {
 		server.WithRegistryInfo(info),
 		server.WithSuite(tracing.NewServerSuite()),
 		server.WithLimit(&limit.Option{MaxConnections: 2000, MaxQPS: 500}),
-		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: config.GlobalServerConfig.Name}))
+		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: config.GlobalServerConfig.Name}),
+		server.WithMiddleware(kitexSentinel.SentinelServerMiddleware(
+			kitexSentinel.WithResourceExtract(func(ctx context.Context, req, resp interface{}) string {
+				return config.GlobalServerConfig.CbRule.Resource
+			}),
+			kitexSentinel.WithBlockFallback(func(ctx context.Context, req, resp interface{}, blockErr error) error {
+				return errors.New("service block")
+			}),
+		)))
 
 	err := svr.Run()
 

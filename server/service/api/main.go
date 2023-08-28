@@ -36,6 +36,9 @@ func main() {
 	pprof.Register(h)
 	h.Use(hertztracing.ServerMiddleware(cfg))
 	h.Use(hertzSentinel.SentinelServerMiddleware(
+		hertzSentinel.WithServerResourceExtractor(func(ctx context.Context, requestContext *app.RequestContext) string {
+			return config.GlobalServerConfig.FlowRule.Resource
+		}),
 		// abort with status 429 by default
 		hertzSentinel.WithServerBlockFallback(func(c context.Context, ctx *app.RequestContext) {
 			ctx.JSON(http.StatusTooManyRequests, nil)

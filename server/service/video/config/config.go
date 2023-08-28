@@ -46,6 +46,7 @@ type ServerConfig struct {
 	OtelInfo           OtelConfig           `mapstructure:"otel" json:"otel"`
 	InteractionSrvInfo InteractionSrvConfig `mapstructure:"interaction_srv" json:"interaction_srv"`
 	UserSrvInfo        UserSrvConfig        `mapstructure:"user_srv" json:"user_srv"`
+	CbRule             CircuitBreakerConfig `mapstructure:"cb_rule" json:"cb_rule"`
 }
 
 type InteractionSrvConfig struct {
@@ -54,4 +55,15 @@ type InteractionSrvConfig struct {
 
 type UserSrvConfig struct {
 	Name string `mapstructure:"name" json:"name"`
+}
+
+type CircuitBreakerConfig struct {
+	Resource                     string  `json:"Resource"`
+	Strategy                     uint32  `json:"Strategy"`
+	RetryTimeoutMs               uint32  `json:"RetryTimeoutMs"`
+	MinRequestAmount             uint64  `json:"MinRequestAmount"`
+	StatIntervalMs               uint32  `json:"StatIntervalMs"`
+	StatSlidingWindowBucketCount uint32  `json:"StatSlidingWindowBucketCount"`
+	MaxAllowedRtMs               uint64  `json:"MaxAllowedRtMs"`
+	Threshold                    float64 `json:"Threshold"`
 }

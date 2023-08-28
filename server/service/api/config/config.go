@@ -40,8 +40,17 @@ type ServerConfig struct {
 	SocialitySrvInfo   RPCSrvConfig    `mapstructure:"sociality_srv" json:"sociality_srv"`
 	VideoSrvInfo       RPCSrvConfig    `mapstructure:"video_srv" json:"video_srv"`
 	IpInfo             *ip2location.DB `mapstructure:"ip" json:"ip"`
+	FlowRule           FlowRule        `mapstructure:"flow_rule" json:"flow_rule"`
 }
 
 type RPCSrvConfig struct {
 	Name string `mapstructure:"name" json:"name"`
+}
+
+type FlowRule struct {
+	Resource               string `json:"resource"`
+	Threshold              uint32 `json:"threshold"`
+	TokenCalculateStrategy int32  `json:"token_calculate_strategy"`
+	ControlBehavior        int32  `json:"control_behavior"`
+	StatIntervalInMs       uint32 `json:"stat_interval_in_ms"`
 }
