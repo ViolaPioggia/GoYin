@@ -31,10 +31,22 @@ type OtelConfig struct {
 }
 
 type ServerConfig struct {
-	Name      string      `mapstructure:"name" json:"name"`
-	Host      string      `mapstructure:"host" json:"host"`
-	Port      string      `mapstructure:"port" json:"port"`
-	MysqlInfo MysqlConfig `mapstructure:"mysql" json:"mysql"`
-	NsqInfo   NsqConfig   `mapstructure:"nsq" json:"nsq"`
-	OtelInfo  OtelConfig  `mapstructure:"otel" json:"otel"`
+	Name      string               `mapstructure:"name" json:"name"`
+	Host      string               `mapstructure:"host" json:"host"`
+	Port      string               `mapstructure:"port" json:"port"`
+	MysqlInfo MysqlConfig          `mapstructure:"mysql" json:"mysql"`
+	NsqInfo   NsqConfig            `mapstructure:"nsq" json:"nsq"`
+	OtelInfo  OtelConfig           `mapstructure:"otel" json:"otel"`
+	CbRule    CircuitBreakerConfig `mapstructure:"cb_rule" json:"cb_rule"`
+}
+
+type CircuitBreakerConfig struct {
+	Resource                     string  `json:"Resource"`
+	Strategy                     uint32  `json:"Strategy"`
+	RetryTimeoutMs               uint32  `json:"RetryTimeoutMs"`
+	MinRequestAmount             uint64  `json:"MinRequestAmount"`
+	StatIntervalMs               uint32  `json:"StatIntervalMs"`
+	StatSlidingWindowBucketCount uint32  `json:"StatSlidingWindowBucketCount"`
+	MaxAllowedRtMs               uint64  `json:"MaxAllowedRtMs"`
+	Threshold                    float64 `json:"Threshold"`
 }

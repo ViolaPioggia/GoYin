@@ -2,12 +2,15 @@ package initialize
 
 import (
 	sentinel "github.com/alibaba/sentinel-golang/api"
+	"github.com/alibaba/sentinel-golang/core/config"
 	"github.com/alibaba/sentinel-golang/core/flow"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
 
 func InitSentinel() {
-	err := sentinel.InitDefault()
+	cfg := config.NewDefaultConfig()
+	cfg.Sentinel.Log.Dir = "./tmp/sentinel/api"
+	err := sentinel.InitWithConfig(cfg)
 	if err != nil {
 		hlog.Fatal("init sentinel failed", err)
 	}

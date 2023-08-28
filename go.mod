@@ -35,6 +35,7 @@ require (
 
 require (
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
+	github.com/alibaba/sentinel-golang/pkg/adapters/kitex v0.0.0-20230626085943-08071855bc67 // indirect
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.18 // indirect
 	github.com/andeya/goutil v1.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.38.20 // indirect
