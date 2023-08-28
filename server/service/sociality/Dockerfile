@@ -8,5 +8,5 @@ COPY ./config.yaml ./server/service/sociality/config.yaml
 # 暴露端口
 EXPOSE 10002
 
-RUN ./sociality
+CMD ["./sociality"]
 
