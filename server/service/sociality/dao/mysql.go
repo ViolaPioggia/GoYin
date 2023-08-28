@@ -71,78 +71,56 @@ func (m MysqlManager) GetUserIdList(ctx context.Context, userId int64, option in
 		return nil, err
 	}
 
-	tx := m.db.Begin()
-	if tx.Error != nil {
-		tx.Rollback()
-		return nil, tx.Error
+	if !flag {
+		return nil, nil
 	}
-	select {
-	case <-ctx.Done():
-		tx.Rollback()
-		return nil, ctx.Err()
-	default:
-		if !flag {
-			return nil, nil
+
+	switch option {
+	case consts.FollowList:
+		var concernList []*model.ConcernList
+		if err = m.db.Where("follower_id = ?", userId).Find(&concernList).Error; err != nil {
+
+			return nil, err
+		}
+		idList := make([]int64, len(concernList))
+		for _, v := range concernList {
+			idList = append(idList, v.UserId)
 		}
 
-		switch option {
-		case consts.FollowList:
-			var concernList []*model.ConcernList
-			if err = m.db.Where("follower_id = ?", userId).Find(&concernList).Error; err != nil {
-				tx.Rollback()
-				return nil, err
-			}
-			idList := make([]int64, len(concernList))
-			for _, v := range concernList {
-				idList = append(idList, v.UserId)
-			}
-			if err = tx.Commit().Error; err != nil {
-				tx.Rollback()
-				return nil, err
-			}
-			return idList, nil
-		case consts.FollowerList:
-			var followerList []*model.ConcernList
-			if err = m.db.Where("user_id = ?", userId).Find(&followerList).Error; err != nil {
-				tx.Rollback()
-				return nil, err
-			}
-			idList := make([]int64, len(followerList))
-			for _, v := range followerList {
+		return idList, nil
+	case consts.FollowerList:
+		var followerList []*model.ConcernList
+		if err = m.db.Where("user_id = ?", userId).Find(&followerList).Error; err != nil {
+			return nil, err
+		}
+		idList := make([]int64, len(followerList))
+		for _, v := range followerList {
+			idList = append(idList, v.FollowerId)
+		}
+
+		return idList, nil
+	case consts.FriendsList:
+		var results []*model.ConcernList
+		err = m.db.Distinct().Select("user_id, follower_id"). //复杂查询，查找互关数据
+									Where("user_id IN (?) AND follower_id IN (?)",
+				m.db.Table("concern_lists").Select("user_id").Where("follower_id = ?", userId),
+				m.db.Table("concern_lists").Select("follower_id").Where("user_id = ?", userId).
+					Or("user_id = ? AND follower_id = ?", userId, userId)).
+			Find(&results).Error
+		if err != nil {
+			return nil, err
+		}
+		idList := make([]int64, len(results)+1)
+		for _, v := range results {
+			if v.UserId == userId {
 				idList = append(idList, v.FollowerId)
 			}
-			if err = tx.Commit().Error; err != nil {
-				tx.Rollback()
-				return nil, err
-			}
-			return idList, nil
-		case consts.FriendsList:
-			var results []*model.ConcernList
-			err = m.db.Distinct().Select("user_id, follower_id"). //复杂查询，查找互关数据
-										Where("user_id IN (?) AND follower_id IN (?)",
-					m.db.Table("concern_lists").Select("user_id").Where("follower_id = ?", userId),
-					m.db.Table("concern_lists").Select("follower_id").Where("user_id = ?", userId).
-						Or("user_id = ? AND follower_id = ?", userId, userId)).
-				Find(&results).Error
-			if err != nil {
-				tx.Rollback()
-				return nil, err
-			}
-			idList := make([]int64, len(results)+1)
-			for _, v := range results {
-				if v.UserId == userId {
-					idList = append(idList, v.FollowerId)
-				}
-			}
-			if err = tx.Commit().Error; err != nil {
-				tx.Rollback()
-				return nil, err
-			}
-			return idList, nil
 		}
 
-		return nil, err
+		return idList, nil
 	}
+	return nil, err
+
 }
 
 func (m MysqlManager) GetSocialInfo(ctx context.Context, userId int64, viewerId int64) (*model.SocialInfo, error) {
@@ -182,66 +160,43 @@ func (m MysqlManager) BatchGetSocialInfo(ctx context.Context, userId []int64, vi
 }
 
 func (m MysqlManager) HandleSocialInfo(ctx context.Context, userId int64, toUserId int64, actionType int8) error {
-	tx := m.db.Begin()
-	if tx.Error != nil {
-		tx.Rollback()
-		return tx.Error
-	}
-	select {
-	case <-ctx.Done():
-		tx.Rollback()
-		return ctx.Err()
-	default:
-		var temp model.ConcernList
-		err := m.db.Where("user_id = ? AND follower_id = ? ", toUserId, userId).First(&temp).Error
-		switch actionType {
-		case consts.Follow:
-			if err != nil && err != gorm.ErrRecordNotFound { //出错返回err
-				tx.Rollback()
-				return err
-			}
-			if err != nil && err == gorm.ErrRecordNotFound { //无数据则插入数据
-				err = m.db.Create(&model.ConcernList{
-					UserId:     userId,
-					FollowerId: toUserId,
-				}).Error
-				if err != nil {
-					tx.Rollback()
-					return err
-				}
-				if err = tx.Commit().Error; err != nil {
-					tx.Rollback()
-					return err
-				}
-				return nil
-			}
-			//没有出错则说明表中存在数据,无需额外改动
-			return nil
-		case consts.UnFollow:
-			if err != nil && err != gorm.ErrRecordNotFound {
-				tx.Rollback()
-				return err
-			}
-			if err != nil && err == gorm.ErrRecordNotFound { //找不到数据则说明没有关注，不作改动
-				tx.Rollback()
-				return nil
-			}
-			//找到了数据则进行删除
-			err = m.db.Where("user_id = ? AND follower_id = ?", toUserId, userId).Delete(&model.ConcernList{}).Error
+	var temp model.ConcernList
+	err := m.db.Where("user_id = ? AND follower_id = ? ", toUserId, userId).First(&temp).Error
+	switch actionType {
+	case consts.Follow:
+		if err != nil && err != gorm.ErrRecordNotFound { //出错返回err
+			return err
+		}
+		if err != nil && err == gorm.ErrRecordNotFound { //无数据则插入数据
+			err = m.db.Create(&model.ConcernList{
+				UserId:     userId,
+				FollowerId: toUserId,
+			}).Error
 			if err != nil {
-				tx.Rollback()
-				return err
-			}
-			if err = tx.Commit().Error; err != nil {
-				tx.Rollback()
 				return err
 			}
 			return nil
 		}
+		//没有出错则说明表中存在数据,无需额外改动
+		return nil
+	case consts.UnFollow:
+		if err != nil && err != gorm.ErrRecordNotFound {
+			return err
+		}
+		if err != nil && err == gorm.ErrRecordNotFound { //找不到数据则说明没有关注，不作改动
+			return nil
+		}
+		//找到了数据则进行删除
+		err = m.db.Where("user_id = ? AND follower_id = ?", toUserId, userId).Delete(&model.ConcernList{}).Error
+		if err != nil {
+			return err
+		}
 
-		return errors.New("invalid action_type")
-
+		return nil
 	}
+
+	return errors.New("invalid action_type")
+
 }
 
 func NewMysqlManager(db *gorm.DB) *MysqlManager {
