@@ -15,15 +15,16 @@ spec:
   ingressClassName: goyin-ink
 
   rules:
-    - http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: goyin-api-svc
-                port:
-                  number: 8080
+    - host: going.test
+      http:
+          paths:
+              - path: /
+                pathType: Prefix
+                backend:
+                  service:
+                    name: goyin-api-svc
+                    port:
+                      number: 8080
 ---
 apiVersion: apps/v1
 kind: Deployment
