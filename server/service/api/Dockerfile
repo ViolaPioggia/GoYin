@@ -6,7 +6,7 @@ WORKDIR /app
 
 # 将源代码复制到容器中
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o api ./server/service/api
+RUN GOOS=linux go build -o api ./server/service/api
 
 FROM alpine:latest
 

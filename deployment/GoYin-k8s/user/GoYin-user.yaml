@@ -1,39 +1,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: goyin_user_dep
+  name: goyin-user-dep
 spec:
   selector:
     matchLabels:
-      app: goyin_user
+      app: goyin-user
   replicas: 1
   template:
     metadata:
       labels:
-        app: goyin_user
+        app: goyin-user
     spec:
       containers:
-        - name: goyin_user
+        - name: goyin-user
           image: violapioggia/goyin_user
           ports:
             - containerPort: 10001
           volumeMounts:
-            - name: goyin_user_data
+            - name: goyin-user-data
               mountPath: /tmp/  # 容器内的挂载路径
       volumes:
-          - name: goyin_user_data
+          - name: goyin-user-data
             hostPath:
-              path: /goyin/user/  # 宿主机上的目录路径
+              path: /home/violapioggia/goyin/user/  # 宿主机上的目录路径
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: goyin_user_svc
+  name: goyin-user-svc
 spec:
   ports:
-    - name: goyin_user
+    - name: goyin-user
       port: 10001
       targetPort: 10001
   selector:
-    app: goyin_user
+    app: goyin-user
   type: ClusterIP
