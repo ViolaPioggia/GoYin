@@ -1,0 +1,54 @@
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: goyin-ink
+
+spec:
+  controller: nginx.org/ingress-controller
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: goyin-ing
+
+spec:
+  ingressClassName: goyin-ink
+
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: goyin-api-svc
+                port:
+                  number: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: goyin-kic-dep
+  namespace: nginx-ingress
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: goyin-kic-dep
+
+  template:
+    metadata:
+      labels:
+        app: goyin-kic-dep
+
+    spec:
+      serviceAccountName: nginx-ingress
+
+      hostNetwork: true
+
+      containers:
+        - image: nginx/nginx-ingress:2.2-alpine
+          name: nginx-ingress
+          args:
+            - -ingress-class=goyin-ink
