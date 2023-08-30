@@ -12,7 +12,7 @@ import (
 func TestUserLifecycleInRedis(t *testing.T) {
 	ctx := context.Background()
 
-	cleanUpFunc, client, err := test.RunRedisInDocker(consts.RedisVideoClientDB, t)
+	cleanUpFunc, client, err := test.RunRedisInDocker(consts.RedisUserClientDB, t)
 	defer cleanUpFunc()
 	if err != nil {
 		t.Fatal(err)
