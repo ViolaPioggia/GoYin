@@ -29,7 +29,10 @@ const (
 	ChatConfigPath        = "./server/service/chat/config.yaml"
 	ApiConfigPath         = "./server/service/api/config.yaml"
 
-	RedisUserClientDB = 2
+	RedisUserClientDB     = 2
+	RedisVideoClientDB    = 3
+	RedisCommentClientDB  = 4
+	RedisFavoriteClientDB = 5
 
 	FollowList   = 0
 	FollowerList = 1
@@ -56,4 +59,18 @@ const (
 	NsqVideoChannel     = "2"
 	NsqSocialityChannel = "3"
 	NsqApiChannel       = "4"
+
+	MySqlDSN           = "%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local"
+	MySQLImage         = "mysql:latest"
+	MySQLContainerPort = "3306/tcp"
+	MySQLContainerIP   = "127.0.0.1"
+	MySQLPort          = "0"
+	MySQLAdmin         = "root"
+	DockerTestMySQLPwd = "123456"
+	DockerTestMySQLDb  = "GoYin"
+
+	RedisImage         = "redis:latest"
+	RedisContainerPort = "6379/tcp"
+	RedisContainerIP   = "127.0.0.1"
+	RedisPort          = "0"
 )
