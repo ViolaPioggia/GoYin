@@ -93,7 +93,7 @@
 
 ​		![](./docs/static/架构图1-2023-08-30-1216.png)
 
-![架构图2-2023-08-30-1241](./docs/static/架构图2-2023-08-30-1241.png)
+![QQ20230830-230759](/Users/violapioggia/GoProjects/GoYin/docs/static/QQ20230830-230759.png)
 
 ## 技术栈
 
@@ -119,22 +119,78 @@
 
 #### mysql
 
+![./docs/statistic/QQ20230830-220032.png](./docs/static/QQ20230830-220032.png)
+
+![](./docs/static/QQ20230830-220107.png)
+
+
+
+![QQ20230830-220132](./docs/static/QQ20230830-220132.png)
+
+![QQ20230830-220141](./docs/static/QQ20230830-220141.png)
+
+![QQ20230830-220157](./docs/static/QQ20230830-220157.png)
+
 #### redis
+
+![QQ20230830-223757](./docs/static/QQ20230830-223757.png)
+
+![QQ20230830-223943](./docs/static/QQ20230830-223943.png)
 
 #### minio
 
+![QQ20230830-223911](./docs/static/QQ20230830-223911.png)
+
 ### nacos
+
+![QQ20230830-223232](./docs/static/QQ20230830-223232.png)
 
 ### 可观测性
 
+![QQ20230830-224259](./docs/static/QQ20230830-224259.png)
+
+![QQ20230830-224308](./docs/static/QQ20230830-224308.png)
+
+![QQ20230830-224651](./docs/static/QQ20230830-224651.png)
+
+### 消息队列
+
+![QQ20230830-230924](./docs/static/QQ20230830-230924.png)
+
+![QQ20230830-230933](./docs/static/QQ20230830-230933.png)
+
 ### 日志
 
+留给yjx
+
 ### k8s
+
+#### 创建 master 节点
+
+![QQ20230827-213037@2x](./docs/static/QQ20230827-213037@2x.png)
+
+#### 创建 worker 节点并连接到 master 节点
+
+![fa316762dd97c5956cc5e2895992959b](./docs/static/fa316762dd97c5956cc5e2895992959b.png)
+
+#### 创建第一个 deployment 和 service
+
+![51c1eb02abb88b4dd136c6a15f8463cf](./docs/static/51c1eb02abb88b4dd136c6a15f8463cf.png)
+
+![QQ20230829-135029](./docs/static/QQ20230829-135029.png)
+
+#### 创建剩下的几个服务节点
+
+![QQ20230829-183659@2x](./docs/static/QQ20230829-183659@2x.png)
+
+service 转发http请求成功
+
+![QQ20230829-182301](./docs/static/QQ20230829-182301.png)
 
 
 
 ## 测试
 
-
+留给wjj和spm
 
 ## 鸣谢
