@@ -119,6 +119,14 @@
 
 #### mysql
 
+运用`gorm`框架实现数据库的增删改查：
+
+![./docs/statistic/gorm.JPG](./docs/static/gorm.JPG)
+
+- 通过事务处理确保数据库中的数据始终保持一致和可靠，避免了数据损坏或不完整的风险。 
+- 使用索引帮助数据库快速定位到符合查询条件的数据，从而避免了全表扫描的开销，提高了查询效率。
+- 利用gorm本身特性并通过简单逻辑判断一定程度上减少了sql注入风险。
+
 ![./docs/statistic/QQ20230830-220032.png](./docs/static/QQ20230830-220032.png)
 
 ![](./docs/static/QQ20230830-220107.png)
@@ -161,25 +169,54 @@
 
 ### 日志
 
-留给yjx
+#### Kibana实现日志可视化
+
+![kibana1](./docs/static/kibana1.png)
+
+#### 查看指定错误等级日志
+
+![kibana2](./docs/static/kibana2.png)
+
+#### 根据feed流请求ip统计用户来源
+
+![kibana3](./docs/static/kibana3.png)
+
+#### kibana图表面板
+
+- 日志错误监测
+- feed流每日不同时间段的请求次数
+- feed流请求用户的城市top10
+
+![dashboard1](./docs/static/dashboard1.png)
+
+![dashboard2](./docs/static/dashboard2.png)
+
+#### logstash配置文件展示
+
+- 根据不同类型的日志信息分别映射字段
+- 实时收集日志信息，重启后从头读取
+
+![logstash](./docs/static/logstash.png)
 
 ### k8s
 
-#### 创建 master 节点
+#### 步骤
+
+##### 创建 master 节点
 
 ![QQ20230827-213037@2x](./docs/static/QQ20230827-213037@2x.png)
 
-#### 创建 worker 节点并连接到 master 节点
+##### 创建 worker 节点并连接到 master 节点
 
 ![fa316762dd97c5956cc5e2895992959b](./docs/static/fa316762dd97c5956cc5e2895992959b.png)
 
-#### 创建第一个 deployment 和 service
+##### 创建第一个 deployment 和 service
 
 ![51c1eb02abb88b4dd136c6a15f8463cf](./docs/static/51c1eb02abb88b4dd136c6a15f8463cf.png)
 
 ![QQ20230829-135029](./docs/static/QQ20230829-135029.png)
 
-#### 创建剩下的几个服务节点
+##### 创建剩下的几个服务节点
 
 ![QQ20230829-183659@2x](./docs/static/QQ20230829-183659@2x.png)
 
@@ -187,7 +224,12 @@ service 转发http请求成功
 
 ![QQ20230829-182301](./docs/static/QQ20230829-182301.png)
 
+#### service+deployment部署优势
 
+1. 服务发现和负载均衡：Service 可以将多个 Pod 组合成一个逻辑的服务，并为这个服务分配一个唯一的虚拟 IP 地址。这样，无论 Pod 的数量如何变化，服务的访问地址都保持不变，同时还可以实现负载均衡，将请求分发到不同的 Pod 上。
+2. 自动伸缩：Deployment 可以根据指定的规则自动调整 Pod 的副本数量，以应对流量的增减。这样可以根据实际需求自动扩展或收缩应用程序的容量。
+3. 无缝升级和回滚：Deployment 允许无缝地进行版本升级和回滚。通过逐步替换 Pod 的方式，可以确保服务在升级过程中不中断，并且在遇到问题时可以快速回滚到之前的版本。
+4. 故障恢复和自愈：使用Deployment 部署的应用程序可以利用Kubernetes的自愈特性。如果某个 Pod 发生故障，Kubernetes 会自动重新创建一个新的 Pod 来替代。
 
 ## 测试
 
