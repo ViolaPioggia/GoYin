@@ -54,11 +54,9 @@ const (
 	NsqChatTopic        = "chat"
 	NsqVideoTopic       = "video"
 	NsqSocialityTopic   = "sociality"
-	NsqApiTopic         = "api"
 	NsqChatChannel      = "1"
 	NsqVideoChannel     = "2"
 	NsqSocialityChannel = "3"
-	NsqApiChannel       = "4"
 
 	MySqlDSN           = "%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local"
 	MySQLImage         = "mysql:latest"

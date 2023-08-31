@@ -47,53 +47,140 @@
 
 · 基础接口：
 
-​	· 视频流接口
+​		· 视频流接口
 
-​	· 用户注册接口
+​		· 用户注册接口
 
-​	· 用户登录接口
+​		· 用户登录接口
 
-​	· 用户信息
+​		· 用户信息
 
-​	· 视频投稿
+​		· 视频投稿
 
-​	· 发布列表
+​		· 发布列表
 
 · 互动接口：
 
-​	· 赞操作
+​		· 赞操作
 
-​	· 喜欢列表
+​		· 喜欢列表
 
-​	· 评论操作
+​		· 评论操作
 
-​	· 视频评论操作
+​		· 视频评论操作
 
 · 社交接口：
 
-​	· 关系操作
+​		· 关系操作
 
-​	· 用户专注操作
+​		· 用户专注操作
 
-​	· 用户粉丝操作
-
-​	· 用户好友列表
-
-​	· 消息：
-
-​		· 聊天记录
+​		· 用户粉丝操作
 
 ​		· 用户好友列表
 
+​		· 消息：
+
+​			· 聊天记录
+
+​			· 用户好友列表
+
 ### 目录结构
-
-​		。。。
-
+```
+├── deployment
+│   ├── GoYin-k8s
+│   │   ├── api
+│   │   ├── chat
+│   │   ├── ingress
+│   │   │   └── common
+│   │   │       └── rbac
+│   │   ├── intetaction
+│   │   ├── sociality
+│   │   ├── user
+│   │   └── video
+│   ├── ip_info
+│   └── opentelemetry
+├── docs
+│   └── static
+├── server
+│   ├── common
+│   │   ├── consts
+│   │   ├── middleware
+│   │   ├── test
+│   │   └── tools
+│   ├── idl
+│   ├── kitex_gen
+│   │   ├── api
+│   │   │   └── apiservice
+│   │   ├── base
+│   │   ├── chat
+│   │   │   └── chatservice
+│   │   ├── errno
+│   │   ├── interaction
+│   │   │   └── interactionserver
+│   │   ├── sociality
+│   │   │   └── socialityservice
+│   │   ├── user
+│   │   │   └── userservice
+│   │   └── video
+│   │       └── videoservice
+│   └── service
+│       ├── api
+│       │   ├── biz
+│       │   │   ├── handler
+│       │   │   │   └── api
+│       │   │   ├── model
+│       │   │   │   ├── api
+│       │   │   │   └── base
+│       │   │   └── router
+│       │   │       └── api
+│       │   ├── config
+│       │   ├── initialize
+│       │   │   └── rpc
+│       │   ├── models
+│       │   ├── pkg
+│       │   └── script
+│       ├── chat
+│       │   ├── config
+│       │   ├── dao
+│       │   ├── initialize
+│       │   ├── model
+│       │   ├── pkg
+│       │   └── script
+│       ├── interaction
+│       │   ├── config
+│       │   ├── dao
+│       │   ├── initialize
+│       │   ├── model
+│       │   ├── pkg
+│       │   └── script
+│       ├── sociality
+│       │   ├── config
+│       │   ├── dao
+│       │   ├── initialize
+│       │   ├── model
+│       │   ├── pkg
+│       │   └── script
+│       ├── user
+│       │   ├── config
+│       │   ├── dao
+│       │   ├── initialize
+│       │   ├── model
+│       │   ├── pkg
+│       │   └── script
+│       └── video
+│           ├── config
+│           ├── dao
+│           ├── initialize
+│           ├── model
+│           ├── pkg
+│           └── script
+```
 ## 代码架构图
 
 ​		![](./docs/static/架构图1-2023-08-30-1216.png)
 
-![QQ20230830-230759](/Users/violapioggia/GoProjects/GoYin/docs/static/QQ20230830-230759.png)
+![QQ20230830-230759](./docs/static/QQ20230830-230759.png)
 
 ## 技术栈
 
@@ -159,13 +246,15 @@
 
 ![QQ20230830-224308](./docs/static/QQ20230830-224308.png)
 
-![QQ20230830-224651](./docs/static/QQ20230830-224651.png)
+![QQ20230831-104652](./docs/static/QQ20230831-104652.png)
 
 ### 消息队列
 
 ![QQ20230830-230924](./docs/static/QQ20230830-230924.png)
 
 ![QQ20230830-230933](./docs/static/QQ20230830-230933.png)
+
+![QQ20230831-103730](./docs/static/QQ20230831-103730.png)
 
 ### 日志
 
