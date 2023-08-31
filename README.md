@@ -180,7 +180,7 @@
 
 ​		![](./docs/static/架构图1-2023-08-30-1216.png)
 
-![QQ20230830-230759](/Users/violapioggia/GoProjects/GoYin/docs/static/QQ20230830-230759.png)
+![QQ20230830-230759](./docs/static/QQ20230830-230759.png)
 
 ## 技术栈
 
@@ -238,7 +238,7 @@
 
 ![QQ20230830-224308](./docs/static/QQ20230830-224308.png)
 
-![QQ20230831-104652](/Users/violapioggia/GoProjects/GoYin/docs/static/QQ20230831-104652.png)
+![QQ20230831-104652](./docs/static/QQ20230831-104652.png)
 
 ### 消息队列
 
@@ -246,7 +246,7 @@
 
 ![QQ20230830-230933](./docs/static/QQ20230830-230933.png)
 
-![QQ20230831-103730](/Users/violapioggia/GoProjects/GoYin/docs/static/QQ20230831-103730.png)
+![QQ20230831-103730](./docs/static/QQ20230831-103730.png)
 
 ### 日志
 
