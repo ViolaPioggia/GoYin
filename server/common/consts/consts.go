@@ -60,7 +60,7 @@ const (
 	NsqSocialityChannel = "3"
 
 	MySqlDSN           = "%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local"
-	MySQLImage         = "mysql:5.7"
+	MySQLImage         = "mysql:latest"
 	MySQLContainerPort = "3306/tcp"
 	MySQLContainerIP   = "127.0.0.1"
 	MySQLPort          = "0"
