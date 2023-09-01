@@ -328,6 +328,124 @@ service 转发http请求成功
 
 ## 测试
 
-留给wjj和spm
+### 单元测试
+
+对涉及 MySQL 与 Redis 的数据操作进行单元测试，为了让测试的数据不影响业务数据库，选择在 Docker 容器内进行测试。具体过程为在 Docker 中启动一个 MySQL 或 Redis 的容器，然后在容器中对数据库进行初始化并进行测试。在测试结束后会自动删除掉容器，释放容器所占用的空间。
+
+```go
+func RunMysqlInDocker(t *testing.T) (cleanUpFunc func(), db *gorm.DB, err error) {
+	c, err := client.NewClientWithOpts(client.WithVersion(api.DefaultVersion))
+    
+	if err != nil {
+		return func() {}, nil, err
+	}
+
+	ctx := context.Background()
+
+	resp, err := c.ContainerCreate(ctx, &container.Config{
+		// ...
+		},
+		Env: []string{ // ...},
+	}, &container.HostConfig{
+		PortBindings: nat.PortMap{
+			// ...
+		},
+	}, nil, nil, "")
+
+	if err != nil {
+		return func() {}, nil, err
+	}
+
+	containerID := resp.ID
+
+	cleanUpFunc = func() {
+		err = c.ContainerRemove(ctx, containerID, types.ContainerRemoveOptions{
+			Force: true,
+		})
+		if err != nil {
+			t.Error("remove test docker failed", err)
+		}
+	}
+
+	err = c.ContainerStart(ctx, containerID, types.ContainerStartOptions{})
+	if err != nil {
+		return cleanUpFunc, nil, err
+	}
+
+	inspRes, err := c.ContainerInspect(ctx, containerID)
+	if err != nil {
+		return cleanUpFunc, nil, err
+	}
+
+	hostPort := inspRes.NetworkSettings.Ports[consts.MySQLContainerPort][0]
+	port, _ := strconv.Atoi(hostPort.HostPort)
+	mysqlDSN := fmt.Sprintf(consts.MySqlDSN, consts.MySQLAdmin, consts.DockerTestMySQLPwd, hostPort.HostIP, port, consts.DockerTestMySQLDb)
+	// Init mysql
+	time.Sleep(20 * time.Second)
+    
+	db, err = gorm.Open(mysql.Open(mysqlDSN), &gorm.Config{
+		// ...
+		},
+		// ...
+			},
+		),
+	})
+
+	// ...
+}
+
+```
+
+逻辑为通过调用 Docker Api 在 Docker 中新建立一个 MySQL 的容器，在测试完毕后通过返回的 `cleanUpFunc` 来 自动删除容器。
+
+在测试文件中使用表格驱动测试测试多种情况。
+
+下面以测试 user 的 MySQL 操作为例。
+
+```go
+func TestUserLifecycleInMySQL(t *testing.T) {
+	cleanUpFunc, db, err := test.RunMysqlInDocker(t)
+
+	defer cleanUpFunc()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	dao := NewUser(db)
+
+	ctx := context.Background()
+    
+    // ...
+
+	cases := []struct {
+		name       string
+		op         func() (string, error)
+		wantErr    bool
+		wantResult string
+	}{
+        // ...
+	}
+
+	for _, cc := range cases {
+		result, err := cc.op()
+		if cc.wantErr {
+			if err == nil {
+				t.Errorf("%s:want error;got none", cc.name)
+			} else {
+				continue
+			}
+		}
+		if err != nil {
+			t.Errorf("%s:operation failed: %v", cc.name, err)
+		}
+		if result != cc.wantResult {
+			t.Errorf("%s:result err: want %s,got %s", cc.name, cc.wantResult, result)
+		}
+	}
+}
+```
+
+
 
 ## 鸣谢

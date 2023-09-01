@@ -4,6 +4,7 @@ import (
 	"GoYin/server/common/consts"
 	"context"
 	"fmt"
+	"github.com/docker/docker/api"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
@@ -23,7 +24,7 @@ import (
 // a MySQL instance in a docker container.
 
 func RunMysqlInDocker(t *testing.T) (cleanUpFunc func(), db *gorm.DB, err error) {
-	c, err := client.NewClientWithOpts(client.WithVersion("1.41"))
+	c, err := client.NewClientWithOpts(client.WithVersion(api.DefaultVersion))
 	if err != nil {
 		return func() {}, nil, err
 	}
