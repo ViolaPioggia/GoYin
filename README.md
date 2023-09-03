@@ -254,6 +254,14 @@
 
 ![QQ20230831-103730](./docs/static/QQ20230831-103730.png)
 
+### pprof
+
+可通过以下代码查看：
+
+``` go tool pprof -http=:8001 http://127.0.0.1:8080/debug/pprof/profile ```
+
+![pprof.png](./docs/static/pprof.png)
+
 ### 日志
 
 #### Kibana实现日志可视化
@@ -340,6 +348,6 @@ service 转发http请求成功
 
 ![bench2.png](./docs/static/bench2.png)
 
-留给wjj和spm
+留给wjj
 
 ## 鸣谢
