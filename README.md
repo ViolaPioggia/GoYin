@@ -328,6 +328,18 @@ service 转发http请求成功
 
 ## 测试
 
+对程序进行了完备的性能测试，并且根据测试结果对代码进行了一定程度的优化
+
+可通过运行以下代码查看：
+
+``` go test -bench='.' -benchmem ```
+
+![bench1.png](./docs/static/bench1.png)
+
+优化后：
+
+![bench2.png](./docs/static/bench2.png)
+
 留给wjj和spm
 
 ## 鸣谢
