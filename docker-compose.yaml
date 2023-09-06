@@ -56,3 +56,54 @@ services:
       - GF_AUTH_DISABLE_LOGIN_FORM=true
     ports:
       - "3000:3000"
+
+  elasticsearch:
+    image: elasticsearch:7.13.1
+    container_name: elasticsearch
+    volumes:
+      - "./elasticsearch_data:/bitnami/elasticsearch"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - TZ=Asia/Shanghai
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    privileged: true
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    networks:
+      - elk
+  kibana:
+    image: kibana:7.13.1
+    container_name: kibana
+    environment:
+      - elasticsearch.hosts=http://elasticsearch:9200
+      - TZ=Asia/Shanghai
+    restart: always
+    ports:
+      - "5601:5601"
+    volumes:
+      - "./kibana_data:/bitnami/kibana"
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.13.1
+    container_name: logstash
+    volumes:
+      - "./logstash.conf:/usr/share/logstash/pipeline/logstash.conf"
+      - "/home/elk/log.log:/home/elk/log.log"
+    environment:
+      - "XPACK_MONITORING_ENABLED=false"
+      - TZ=Asia/Shanghai
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk
+networks:
+  elk:
+    external: true
