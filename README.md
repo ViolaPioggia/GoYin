@@ -198,6 +198,8 @@
 
 云原生技术栈：k8s，docker，nginx-ingress
 
+CI:github-action
+
 ## 具体功能
 
 ### 数据库
