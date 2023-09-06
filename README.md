@@ -254,6 +254,14 @@
 
 ![QQ20230831-103730](./docs/static/QQ20230831-103730.png)
 
+### pprof
+
+可通过以下代码查看：
+
+``` go tool pprof -http=:8001 http://127.0.0.1:8080/debug/pprof/profile ```
+
+![pprof.png](./docs/static/pprof.png)
+
 ### 日志
 
 #### Kibana实现日志可视化
@@ -445,7 +453,25 @@ func TestUserLifecycleInMySQL(t *testing.T) {
 	}
 }
 ```
+### 性能测试
 
+对程序进行了完备的性能测试，并且根据测试结果对代码进行了一定程度的优化
+
+可通过运行以下代码查看：
+
+``` go test -bench='.' -benchmem ```
+
+![bench1.png](./docs/static/bench1.png)
+
+优化后：
+
+![bench2.png](./docs/static/bench2.png)
 
 
 ## 鸣谢
+@[withoutabc](https://github.com/withoutabc)
+@[KeiichiKasai](https://github.com/KeiichiKasai)
+@[shiningstoned](https://github.com/shiningstoned)
+@[Hanser001](https://github.com/Hanser001)
+
+- [字节跳动青训营](https://youthcamp.bytedance.com/)
