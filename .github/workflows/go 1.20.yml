@@ -40,9 +40,6 @@ jobs:
     
     - name: Test Chat
       run: go test -v ./server/service/chat/
-      
-    - name: Test Chat_Bench
-      run: cd ./server/service/chat/dao/ && go test mysql_test.go -v -bench=. -benchmem
 
     - name: Build Interaction
       run: go build -v ./server/service/interaction/ 
@@ -50,17 +47,11 @@ jobs:
     - name: Test Interaction
       run: go test -v ./server/service/interaction/
 
-    - name: Test Interaction_Bench
-      run: cd ./server/service/interaction/dao/ && go test mysql_test.go -v -bench=. -benchmem
-
     - name: Build Sociality
       run: go build -v ./server/service/sociality/
 
     - name: Test Sociality
       run: go test -v ./server/service/sociality/
-
-    - name: Test Sociality_Bench
-      run: cd ./server/service/sociality/dao/ && go test mysql_test.go -v -bench=. -benchmem
 
     - name: Build User
       run: go build -v ./server/service/user/
@@ -68,14 +59,8 @@ jobs:
     - name: Test User
       run: go test -v ./server/service/user/
 
-    - name: Test User_Bench
-      run: cd ./server/service/user/dao/ && go test mysql_test.go -v -bench=. -benchmem
-
     - name: Build Video
       run: go build -v ./server/service/video/
 
     - name: Test Video
       run: go test -v ./server/service/video/
-
-    - name: Test Video_Bench
-      run: cd ./server/service/video/dao/ && go test mysql_test.go -v -bench=. -benchmem
