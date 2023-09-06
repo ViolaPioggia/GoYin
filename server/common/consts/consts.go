@@ -29,6 +29,7 @@ const (
 	ChatConfigPath        = "./server/service/chat/config.yaml"
 	ApiConfigPath         = "./server/service/api/config.yaml"
 
+	RedisSocialClientDB   = 1
 	RedisUserClientDB     = 2
 	RedisVideoClientDB    = 3
 	RedisCommentClientDB  = 4

@@ -37,15 +37,13 @@
 
 · 敏感信息加密加盐处理
 
-· 对敏感信息进行屏蔽过滤
-
 · 具备CI功能，对整体项目代码进行了高覆盖率的单元测试和性能测试
 
 · k8s集群搭建项目，具备容错性，支持横向拓展使项目管理更加便捷，负载均衡
 
 ## 功能介绍
 
-· 基础接口：
+**· 基础接口：**
 
 ​		· 视频流接口
 
@@ -59,7 +57,7 @@
 
 ​		· 发布列表
 
-· 互动接口：
+**· 互动接口：**
 
 ​		· 赞操作
 
@@ -69,7 +67,7 @@
 
 ​		· 视频评论操作
 
-· 社交接口：
+**· 社交接口：**
 
 ​		· 关系操作
 
@@ -200,6 +198,8 @@
 
 云原生技术栈：k8s，docker，nginx-ingress
 
+CI:github-action
+
 ## 具体功能
 
 ### 数据库
@@ -256,6 +256,14 @@
 
 ![QQ20230831-103730](./docs/static/QQ20230831-103730.png)
 
+### pprof
+
+可通过以下代码查看：
+
+``` go tool pprof -http=:8001 http://127.0.0.1:8080/debug/pprof/profile ```
+
+![pprof.png](./docs/static/pprof.png)
+
 ### 日志
 
 #### Kibana实现日志可视化
@@ -292,6 +300,9 @@
 #### 步骤
 
 ##### 创建 master 节点
+虚拟机内网搭建 k8s 集群
+
+#### 创建 master 节点
 
 ![QQ20230827-213037@2x](./docs/static/QQ20230827-213037@2x.png)
 
@@ -313,8 +324,13 @@ service 转发http请求成功
 
 ![QQ20230829-182301](./docs/static/QQ20230829-182301.png)
 
-#### service+deployment部署优势
+#### 配置 nginx-ingress
 
+![QQ20230831-202319@2x](./docs/static/QQ20230831-202319@2x.png)
+
+![QQ20230831-202347@2x](./docs/static/QQ20230831-202347@2x.png)
+
+#### service+deployment部署优势
 1. 服务发现和负载均衡：Service 可以将多个 Pod 组合成一个逻辑的服务，并为这个服务分配一个唯一的虚拟 IP 地址。这样，无论 Pod 的数量如何变化，服务的访问地址都保持不变，同时还可以实现负载均衡，将请求分发到不同的 Pod 上。
 2. 自动伸缩：Deployment 可以根据指定的规则自动调整 Pod 的副本数量，以应对流量的增减。这样可以根据实际需求自动扩展或收缩应用程序的容量。
 3. 无缝升级和回滚：Deployment 允许无缝地进行版本升级和回滚。通过逐步替换 Pod 的方式，可以确保服务在升级过程中不中断，并且在遇到问题时可以快速回滚到之前的版本。
@@ -322,6 +338,142 @@ service 转发http请求成功
 
 ## 测试
 
-留给wjj和spm
+### 单元测试
+
+对涉及 MySQL 与 Redis 的数据操作进行单元测试，为了让测试的数据不影响业务数据库，选择在 Docker 容器内进行测试。具体过程为在 Docker 中启动一个 MySQL 或 Redis 的容器，然后在容器中对数据库进行初始化并进行测试。在测试结束后会自动删除掉容器，释放容器所占用的空间。
+
+```go
+func RunMysqlInDocker(t *testing.T) (cleanUpFunc func(), db *gorm.DB, err error) {
+	c, err := client.NewClientWithOpts(client.WithVersion(api.DefaultVersion))
+    
+	if err != nil {
+		return func() {}, nil, err
+	}
+
+	ctx := context.Background()
+
+	resp, err := c.ContainerCreate(ctx, &container.Config{
+		// ...
+		},
+		Env: []string{ // ...},
+	}, &container.HostConfig{
+		PortBindings: nat.PortMap{
+			// ...
+		},
+	}, nil, nil, "")
+
+	if err != nil {
+		return func() {}, nil, err
+	}
+
+	containerID := resp.ID
+
+	cleanUpFunc = func() {
+		err = c.ContainerRemove(ctx, containerID, types.ContainerRemoveOptions{
+			Force: true,
+		})
+		if err != nil {
+			t.Error("remove test docker failed", err)
+		}
+	}
+
+	err = c.ContainerStart(ctx, containerID, types.ContainerStartOptions{})
+	if err != nil {
+		return cleanUpFunc, nil, err
+	}
+
+	inspRes, err := c.ContainerInspect(ctx, containerID)
+	if err != nil {
+		return cleanUpFunc, nil, err
+	}
+
+	hostPort := inspRes.NetworkSettings.Ports[consts.MySQLContainerPort][0]
+	port, _ := strconv.Atoi(hostPort.HostPort)
+	mysqlDSN := fmt.Sprintf(consts.MySqlDSN, consts.MySQLAdmin, consts.DockerTestMySQLPwd, hostPort.HostIP, port, consts.DockerTestMySQLDb)
+	// Init mysql
+	time.Sleep(20 * time.Second)
+    
+	db, err = gorm.Open(mysql.Open(mysqlDSN), &gorm.Config{
+		// ...
+		},
+		// ...
+			},
+		),
+	})
+
+	// ...
+}
+
+```
+
+逻辑为通过调用 Docker Api 在 Docker 中新建立一个 MySQL 的容器，在测试完毕后通过返回的 `cleanUpFunc` 来 自动删除容器。
+
+在测试文件中使用表格驱动测试测试多种情况。
+
+下面以测试 user 的 MySQL 操作为例。
+
+```go
+func TestUserLifecycleInMySQL(t *testing.T) {
+	cleanUpFunc, db, err := test.RunMysqlInDocker(t)
+
+	defer cleanUpFunc()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	dao := NewUser(db)
+
+	ctx := context.Background()
+    
+    // ...
+
+	cases := []struct {
+		name       string
+		op         func() (string, error)
+		wantErr    bool
+		wantResult string
+	}{
+        // ...
+	}
+
+	for _, cc := range cases {
+		result, err := cc.op()
+		if cc.wantErr {
+			if err == nil {
+				t.Errorf("%s:want error;got none", cc.name)
+			} else {
+				continue
+			}
+		}
+		if err != nil {
+			t.Errorf("%s:operation failed: %v", cc.name, err)
+		}
+		if result != cc.wantResult {
+			t.Errorf("%s:result err: want %s,got %s", cc.name, cc.wantResult, result)
+		}
+	}
+}
+```
+### 性能测试
+
+对程序进行了完备的性能测试，并且根据测试结果对代码进行了一定程度的优化
+
+可通过运行以下代码查看：
+
+``` go test -bench='.' -benchmem ```
+
+![bench1.png](./docs/static/bench1.png)
+
+优化后：
+
+![bench2.png](./docs/static/bench2.png)
+
 
 ## 鸣谢
+@[withoutabc](https://github.com/withoutabc)
+@[KeiichiKasai](https://github.com/KeiichiKasai)
+@[shiningstoned](https://github.com/shiningstoned)
+@[Hanser001](https://github.com/Hanser001)
+
+- [字节跳动青训营](https://youthcamp.bytedance.com/)
