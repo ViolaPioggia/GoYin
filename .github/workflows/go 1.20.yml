@@ -26,7 +26,15 @@ jobs:
 
     - name: Test Api
       run: go test -v ./server/service/api/
-      
+
+    - uses: docker-practice/actions-setup-docker@master
+      timeout-minutes: 12
+
+    - name: Pull images
+      run: |
+        docker pull mysql:latest
+        docker pull redis:latest
+
     - name: Build Chat
       run: go build -v ./server/service/chat/
     
