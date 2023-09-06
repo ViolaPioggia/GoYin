@@ -23,7 +23,7 @@ import (
 // a MySQL instance in a docker container.
 
 func RunMysqlInDocker(t *testing.T) (cleanUpFunc func(), db *gorm.DB, err error) {
-	c, err := client.NewClientWithOpts(client.WithVersion("1.41"))
+	c, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		return func() {}, nil, err
 	}
