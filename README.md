@@ -264,6 +264,109 @@ CI:github-action
 
 ![pprof.png](./docs/static/pprof.png)
 
+### Sentinel
+
+- 均以`nacos`作为规则配置中心
+
+#### api接入限流组件
+
+```go
+func InitSentinel() {
+	cfg := config.NewDefaultConfig()
+	cfg.Sentinel.Log.Dir = "./tmp/sentinel/api"
+	err := sentinel.InitWithConfig(cfg)
+	if err != nil {
+		hlog.Fatal("init sentinel failed", err)
+	}
+	_, err = flow.LoadRules([]*flow.Rule{
+		{
+			Resource:               serverConfig.GlobalServerConfig.FlowRule.Resource,
+			Threshold:              float64(serverConfig.GlobalServerConfig.FlowRule.Threshold),
+			TokenCalculateStrategy: flow.TokenCalculateStrategy(serverConfig.GlobalServerConfig.FlowRule.TokenCalculateStrategy),
+			ControlBehavior:        flow.ControlBehavior(serverConfig.GlobalServerConfig.FlowRule.TokenCalculateStrategy),
+			StatIntervalInMs:       serverConfig.GlobalServerConfig.FlowRule.StatIntervalInMs,
+		},
+	})
+	if err != nil {
+		hlog.Fatal("load sentinel failed", err)
+	}
+}
+```
+
+```go
+func main(){
+    ...
+    h.Use(hertzSentinel.SentinelServerMiddleware(
+   hertzSentinel.WithServerResourceExtractor(func(ctx context.Context, requestContext *app.RequestContext) string {
+      return config.GlobalServerConfig.FlowRule.Resource
+   }),
+   // abort with status 429 by default
+   hertzSentinel.WithServerBlockFallback(func(c context.Context, ctx *app.RequestContext) {
+      ctx.JSON(http.StatusTooManyRequests, nil)
+      ctx.Abort()
+   }),
+))
+    ...
+}
+```
+
+#### rpc使用熔断器
+
+- 以user服务为例
+
+```go
+func Sentinel() {
+	conf := SentinelConfig.NewDefaultConfig()
+	conf.Sentinel.Log.Dir = consts.UserSentinelFilePath
+	err := sentinel.InitWithConfig(conf)
+	if err != nil {
+		klog.Fatal(err)
+	}
+	// 注册状态变化监听器，用于观察内部断路器的状态变化
+	circuitbreaker.RegisterStateChangeListeners(&stateChangeTestListener{})
+	c := config.GlobalServerConfig.CbRule
+	// 加载断路器规则
+	_, err = circuitbreaker.LoadRules([]*circuitbreaker.Rule{
+		// 统计时间窗口=5秒，恢复时间=3秒，慢请求上限=50毫秒，最大慢请求比例=50%
+		{
+			Resource:                     c.Resource,
+			Strategy:                     circuitbreaker.Strategy(c.Strategy),
+			RetryTimeoutMs:               c.RetryTimeoutMs,
+			MinRequestAmount:             c.MinRequestAmount,
+			StatIntervalMs:               c.StatIntervalMs,
+			StatSlidingWindowBucketCount: c.StatSlidingWindowBucketCount,
+			MaxAllowedRtMs:               c.MaxAllowedRtMs,
+			Threshold:                    c.Threshold,
+		},
+	})
+	if err != nil {
+		klog.Fatal(err)
+	}
+}
+```
+
+```go
+func main() {
+	srv := user.NewServer(impl,
+        ...                  
+		// QPS限流
+		server.WithLimit(&limit.Option{MaxConnections: 2000, MaxQPS: 500}),
+		// 熔断
+		server.WithMiddleware(kitexSentinel.SentinelServerMiddleware(
+			kitexSentinel.WithResourceExtract(func(ctx context.Context, req, resp interface{}) string {
+				return config.GlobalServerConfig.CbRule.Resource
+			}),
+			kitexSentinel.WithBlockFallback(func(ctx context.Context, req, resp interface{}, blockErr error) error {
+				return errors.New("service block")
+			}),
+		)),
+	)
+    ...
+}
+```
+
+
+
 ### 日志
 
 #### Kibana实现日志可视化
